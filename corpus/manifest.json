@@ -134,16 +134,16 @@
       ]
     },
     {
-      "id": "qr-rickroll",
-      "title": "QR code - Rick Roll",
+      "id": "qr-mystery",
+      "title": "QR code - what's behind this link?",
       "year": 2026,
       "category": "barcode",
       "license": "CC0 (locally generated with qrencode)",
       "source": "https://github.com/Arthur-Ficial/auge-web",
       "wiki_file": null,
       "local": true,
-      "filename": "qr-rickroll.png",
-      "blurb": "A QR you almost certainly should not scan. auge --barcode reads it on-device so you know what's behind the link before opening it. (It's the song. Of course it's the song.)",
+      "filename": "qr-mystery.png",
+      "blurb": "Most QR codes you scan in the wild, you scan blind. auge decodes the URL on-device first - so you can read the destination before your phone does. Some links are surprises. Some are jokes. This one is a 38-year-old joke that still works.",
       "auge_args": [
         "--all"
       ]
