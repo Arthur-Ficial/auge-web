@@ -531,9 +531,84 @@
     .arch-arrow { color: var(--gray-500); }
 
     /* ============== SHOWCASE ============== */
+    /* ===== SUPPORTS / CAPABILITIES ===== */
+    .supports { background: var(--cream); }
+    .supports-grid {
+      max-width: 1080px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 1000px) { .supports-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px)  { .supports-grid { grid-template-columns: 1fr; } }
+    .supports-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 18px 20px 20px;
+    }
+    .supports-card h3 {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--indigo-700);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .supports-card ul { list-style: none; padding: 0; margin: 0; }
+    .supports-card li {
+      font-size: 13px;
+      color: var(--gray-700);
+      padding: 4px 0;
+      line-height: 1.55;
+    }
+    .supports-card code {
+      background: var(--gray-100);
+      color: var(--indigo-700);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
     .showcase { background: white; }
-    .showcase-intro { max-width: 720px; margin: 0 auto 56px; text-align: center; }
+    .showcase-intro { max-width: 720px; margin: 0 auto 32px; text-align: center; }
     .showcase-intro p { font-size: 17px; color: var(--gray-700); }
+
+    .corpus-summary {
+      max-width: 980px; margin: 0 auto 56px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 900px) { .corpus-summary { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 480px) { .corpus-summary { grid-template-columns: repeat(2, 1fr); } }
+    .corpus-stat {
+      background: var(--cream);
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 16px 12px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+    }
+    .corpus-stat .num {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--indigo-600);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .corpus-stat .lbl {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+    }
     .cards { display: flex; flex-direction: column; gap: 28px; max-width: 980px; margin: 0 auto; }
 
     .card {
@@ -1117,6 +1192,99 @@ feline: 92%</span></pre>
   </div>
 </section>
 
+<!-- ============================== SUPPORTS / CAPABILITIES ============================== -->
+<section class="supports" id="supports">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow">Capabilities</span>
+      <h2>Everything auge supports.</h2>
+      <p>One binary, every mode, every common image format, dozens of languages, every major barcode standard. All on-device.</p>
+    </div>
+    <div class="supports-grid">
+      <div class="supports-card">
+        <h3>Input formats</h3>
+        <ul>
+          <li><code>PNG</code> · <code>JPEG</code> · <code>HEIC</code> · <code>HEIF</code></li>
+          <li><code>TIFF</code> · <code>BMP</code> · <code>GIF</code></li>
+          <li><code>PDF</code> (multi-page, text-layer or rasterize)</li>
+          <li>NSPasteboard image (<code>--clipboard</code>)</li>
+          <li>Stdin pipe (file paths or bytes)</li>
+        </ul>
+      </div>
+      <div class="supports-card">
+        <h3>Analyses</h3>
+        <ul>
+          <li><code>--ocr</code> Text recognition (<code>VNRecognizeTextRequest</code>)</li>
+          <li><code>--classify</code> 1000+ labels (<code>VNClassifyImageRequest</code>)</li>
+          <li><code>--barcode</code> 12 symbologies (<code>VNDetectBarcodesRequest</code>)</li>
+          <li><code>--faces</code> Bounding boxes (<code>VNDetectFaceRectanglesRequest</code>)</li>
+          <li><code>--all</code> Every analysis in one pass</li>
+        </ul>
+      </div>
+      <div class="supports-card">
+        <h3>Output formats</h3>
+        <ul>
+          <li><code>plain</code> Default; structured per mode</li>
+          <li><code>json</code> Pretty-printed structured output</li>
+          <li><code>--compact</code> Single-line JSON</li>
+          <li><code>ndjson</code> One JSON record per line</li>
+          <li><code>md</code> GitHub-flavored Markdown</li>
+        </ul>
+      </div>
+      <div class="supports-card">
+        <h3>Barcode symbologies</h3>
+        <ul>
+          <li><code>QR</code> · <code>Aztec</code> · <code>DataMatrix</code></li>
+          <li><code>EAN-13</code> · <code>EAN-8</code> · <code>UPC-A</code> · <code>UPC-E</code></li>
+          <li><code>Code 128</code> · <code>Code 39</code> · <code>Code 93</code></li>
+          <li><code>PDF417</code> · <code>ITF</code> (Interleaved 2 of 5)</li>
+          <li>Plus URL/vCard/WiFi schema decoding</li>
+        </ul>
+      </div>
+      <div class="supports-card">
+        <h3>OCR languages (BCP-47)</h3>
+        <ul>
+          <li>Latin script: en, de, fr, es, it, pt, nl, sv, da, nb, fi, pl, cs, hu, tr, vi, cy, la</li>
+          <li>CJK: zh-Hans, zh-Hant, ja, ko</li>
+          <li>RTL: ar, he, fa, ur</li>
+          <li>Other: ru, uk, sr-Cyrl, sr-Latn, el, hi, th, id</li>
+          <li>Mix any of them with <code>--langs a,b,c</code></li>
+        </ul>
+      </div>
+      <div class="supports-card">
+        <h3>OCR controls</h3>
+        <ul>
+          <li><code>--langs</code> BCP-47 hints (priority order)</li>
+          <li><code>--enhance</code> Upscale tiny inputs before OCR</li>
+          <li><code>--dpi</code> PDF rasterization 72-600 (default 200)</li>
+          <li><code>--prefer-embedded</code> Use PDF text layer if present</li>
+          <li><code>--clean</code> FoundationModels post-pass (macOS 26+)</li>
+        </ul>
+      </div>
+      <div class="supports-card">
+        <h3>Privacy guarantees</h3>
+        <ul>
+          <li>100% on-device · No API keys · No telemetry</li>
+          <li><code>NetworkGuard</code> URLProtocol blocks every <code>http</code>/<code>https</code>/<code>ws</code>/<code>wss</code> at runtime</li>
+          <li>Zero third-party Swift dependencies</li>
+          <li>No model downloads (Vision ships with macOS)</li>
+          <li>MIT license</li>
+        </ul>
+      </div>
+      <div class="supports-card">
+        <h3>Platform &amp; build</h3>
+        <ul>
+          <li>macOS 10.15+ (full set on macOS 26 Tahoe)</li>
+          <li>Apple Silicon or Intel</li>
+          <li>Builds with Command Line Tools - no Xcode</li>
+          <li>Swift 6.3 strict concurrency</li>
+          <li>Hand-rolled CLI - no <code>swift-argument-parser</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ============================== SHOWCASE ============================== -->
 <section class="showcase" id="showcase">
   <div class="container">
@@ -1127,4 +1295,14 @@ feline: 92%</span></pre>
     <div class="showcase-intro">
       <p>Every example below is processed by running the real <code>auge</code> binary (v__VERSION__) on a public-domain document from Wikimedia Commons - at build time, on a Mac, with no network. Each card shows what auge produced: structured OCR text, classification labels with confidence, barcode payloads, face bounding boxes overlaid on the image, plus the full JSON output, on-device. Nothing is mocked or post-processed.</p>
     </div>
+
+    <div class="corpus-summary">
+      <div class="corpus-stat"><span class="num">__CORPUS_TOTAL__</span><span class="lbl">examples below</span></div>
+      <div class="corpus-stat"><span class="num">__CORPUS_FACES__</span><span class="lbl">with face detection</span></div>
+      <div class="corpus-stat"><span class="num">__CORPUS_OCR__</span><span class="lbl">with OCR text extraction</span></div>
+      <div class="corpus-stat"><span class="num">__CORPUS_BARCODES__</span><span class="lbl">with QR / barcode decoding</span></div>
+      <div class="corpus-stat"><span class="num">__CORPUS_CLASSIFY__</span><span class="lbl">with classification labels</span></div>
+      <div class="corpus-stat"><span class="num">__CORPUS_LANGS__</span><span class="lbl">distinct languages OCR'd</span></div>
+    </div>
+
     <div class="cards">

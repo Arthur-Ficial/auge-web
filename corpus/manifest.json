@@ -1,15 +1,43 @@
 {
   "items": [
     {
-      "id": "mona-lisa",
-      "title": "Mona Lisa - Leonardo da Vinci, 1503",
-      "year": 1503,
-      "category": "historical",
-      "license": "Public Domain (Leonardo died 1519)",
-      "source": "https://commons.wikimedia.org/wiki/File:Mona_Lisa.jpg",
-      "wiki_file": "Mona_Lisa.jpg",
-      "filename": "mona-lisa.jpg",
-      "blurb": "Probably the most-recognized painting on Earth. auge detects her face and classifies the image - a useful sanity check for what Vision considers a 'painting' vs 'portrait'.",
+      "id": "bell-labs-transistor",
+      "title": "The transistor inventors - Bell Labs, 1948",
+      "year": 1948,
+      "category": "faces",
+      "license": "Public Domain (Bell Labs PR photo, PD-US-no-notice)",
+      "source": "https://commons.wikimedia.org/wiki/File:Bardeen_Shockley_Brattain_1948.JPG",
+      "wiki_file": "Bardeen_Shockley_Brattain_1948.JPG",
+      "filename": "bell-labs-transistor.jpg",
+      "blurb": "John Bardeen, William Shockley, Walter Brattain - the three Bell Labs scientists who invented the transistor in December 1947, photographed the next year. Every CPU on Earth descends from this workbench. auge detects all three faces.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "earthrise-apollo-8",
+      "title": "Earthrise - Apollo 8, 24 December 1968",
+      "year": 1968,
+      "category": "classify",
+      "license": "Public Domain (NASA work)",
+      "source": "https://commons.wikimedia.org/wiki/File:NASA-Apollo8-Dec24-Earthrise.jpg",
+      "wiki_file": "NASA-Apollo8-Dec24-Earthrise.jpg",
+      "filename": "earthrise.jpg",
+      "blurb": "Bill Anders's photograph of Earth rising over the Moon, taken from Apollo 8 on Christmas Eve 1968. The most-reproduced photo of Earth ever taken. Galen Rowell called it 'the most influential environmental photograph ever taken.'",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "frans-hals-banquet",
+      "title": "Banquet of the Officers of the St Hadrian Civic Guard - Frans Hals",
+      "year": 1627,
+      "category": "faces",
+      "license": "Public Domain (Hals died 1666)",
+      "source": "https://commons.wikimedia.org/wiki/File:Frans_Hals_-_Banquet_of_the_Officers_of_the_St_Hadrian_Civic_Guard_Company_-_WGA11092.jpg",
+      "wiki_file": "Frans_Hals_-_Banquet_of_the_Officers_of_the_St_Hadrian_Civic_Guard_Company_-_WGA11092.jpg",
+      "filename": "hals-banquet.jpg",
+      "blurb": "Twelve officers at a banquet, Haarlem 1627. Frans Hals founded the Dutch group portrait genre - eyes alive, faces individual. A perfect multi-face benchmark.",
       "auge_args": [
         "--all"
       ]
@@ -32,29 +60,44 @@
       ]
     },
     {
-      "id": "frans-hals-banquet",
-      "title": "Banquet of the Officers of the St Hadrian Civic Guard - Frans Hals",
-      "year": 1627,
-      "category": "faces",
-      "license": "Public Domain (Hals died 1666)",
-      "source": "https://commons.wikimedia.org/wiki/File:Frans_Hals_-_Banquet_of_the_Officers_of_the_St_Hadrian_Civic_Guard_Company_-_WGA11092.jpg",
-      "wiki_file": "Frans_Hals_-_Banquet_of_the_Officers_of_the_St_Hadrian_Civic_Guard_Company_-_WGA11092.jpg",
-      "filename": "hals-banquet.jpg",
-      "blurb": "Twelve officers at a banquet, Haarlem 1627. Frans Hals founded the Dutch group portrait genre - eyes alive, faces individual. A perfect multi-face benchmark.",
+      "id": "qr-mystery",
+      "title": "QR code - what's behind this link?",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated with qrencode)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "qr-mystery.png",
+      "blurb": "Most QR codes you scan in the wild, you scan blind. auge decodes the URL on-device first - so you can read the destination before your phone does. Some links are surprises. Some are jokes. This one is a 38-year-old joke that still works.",
       "auge_args": [
         "--all"
       ]
     },
     {
-      "id": "qr-code",
-      "title": "QR code - Wikipedia URL",
-      "year": 2024,
-      "category": "barcode",
-      "license": "CC0 (algorithmic)",
-      "source": "https://commons.wikimedia.org/wiki/File:QR_code_for_mobile_English_Wikipedia.svg",
-      "wiki_file": "QR_code_for_mobile_English_Wikipedia.svg",
-      "filename": "qr-wikipedia.png",
-      "blurb": "A QR code that decodes to Wikipedia's mobile URL. auge --all decodes the barcode and runs every other analysis on the same image, on-device, no camera, no network.",
+      "id": "rembrandt-anatomy",
+      "title": "The Anatomy Lesson of Dr Nicolaes Tulp - Rembrandt, 1632",
+      "year": 1632,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "wiki_file": "Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "filename": "rembrandt-anatomy.jpg",
+      "blurb": "Rembrandt at 26, painting the Amsterdam Surgeons' Guild. Eight faces around a dissection - intimate, geometric, masterful. auge detects each one.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "blue-marble",
+      "title": "The Blue Marble - Apollo 17, 1972",
+      "year": 1972,
+      "category": "classify",
+      "license": "Public Domain (NASA work)",
+      "source": "https://commons.wikimedia.org/wiki/File:The_Earth_seen_from_Apollo_17.jpg",
+      "wiki_file": "The_Earth_seen_from_Apollo_17.jpg",
+      "filename": "blue-marble.jpg",
+      "blurb": "Apollo 17, 7 December 1972. The crew, the last humans to leave Low Earth Orbit, took the only fully-illuminated photo of Earth made by an astronaut. Vision classifies 'astronomy / planet / globe'.",
       "auge_args": [
         "--all"
       ]
@@ -90,15 +133,57 @@
       ]
     },
     {
-      "id": "rembrandt-anatomy",
-      "title": "The Anatomy Lesson of Dr Nicolaes Tulp - Rembrandt, 1632",
-      "year": 1632,
+      "id": "apollo-11-crew",
+      "title": "Apollo 11 crew portrait, 1969",
+      "year": 1969,
       "category": "faces",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
-      "wiki_file": "Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
-      "filename": "rembrandt-anatomy.jpg",
-      "blurb": "Rembrandt at 26, painting the Amsterdam Surgeons' Guild. Eight faces around a dissection - intimate, geometric, masterful. auge detects each one.",
+      "license": "Public Domain (NASA work)",
+      "source": "https://commons.wikimedia.org/wiki/File:Apollo_11_Crew.jpg",
+      "wiki_file": "Apollo_11_Crew.jpg",
+      "filename": "apollo-11-crew.jpg",
+      "blurb": "Armstrong, Collins, Aldrin in pre-flight portrait. NASA published this and every other crew photo into the public domain - try OCR-ing the name tags on the spacesuits. auge does both modes in one pass.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "qr-code",
+      "title": "QR code - Wikipedia URL",
+      "year": 2024,
+      "category": "barcode",
+      "license": "CC0 (algorithmic)",
+      "source": "https://commons.wikimedia.org/wiki/File:QR_code_for_mobile_English_Wikipedia.svg",
+      "wiki_file": "QR_code_for_mobile_English_Wikipedia.svg",
+      "filename": "qr-wikipedia.png",
+      "blurb": "A QR code that decodes to Wikipedia's mobile URL. auge --all decodes the barcode and runs every other analysis on the same image, on-device, no camera, no network.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "pillars-of-creation",
+      "title": "Pillars of Creation - Hubble, 2014",
+      "year": 2014,
+      "category": "classify",
+      "license": "Public Domain (NASA / ESA)",
+      "source": "https://commons.wikimedia.org/wiki/File:Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg",
+      "wiki_file": "Pillars_of_creation_2014_HST_WFC3-UVIS_full-res_denoised.jpg",
+      "filename": "pillars-of-creation.jpg",
+      "blurb": "Three columns of cold gas and dust in the Eagle Nebula, 6,500 light-years from Earth. Hubble first imaged them in 1995; this is the 2014 reshoot at higher resolution. Vision classifies 'astronomy / nebula / sky'.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "mona-lisa",
+      "title": "Mona Lisa - Leonardo da Vinci, 1503",
+      "year": 1503,
+      "category": "historical",
+      "license": "Public Domain (Leonardo died 1519)",
+      "source": "https://commons.wikimedia.org/wiki/File:Mona_Lisa.jpg",
+      "wiki_file": "Mona_Lisa.jpg",
+      "filename": "mona-lisa.jpg",
+      "blurb": "Probably the most-recognized painting on Earth. auge detects her face and classifies the image - a useful sanity check for what Vision considers a 'painting' vs 'portrait'.",
       "auge_args": [
         "--all"
       ]
@@ -129,35 +214,6 @@
       "wiki_file": "Tsunami_by_hokusai_19th_century.jpg",
       "filename": "hokusai-wave.jpg",
       "blurb": "Hokusai's signature woodblock print from his Thirty-six Views of Mount Fuji. The most reproduced Japanese artwork ever made. Classify pulls 'art / painting / wave / sea'.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
-      "id": "qr-mystery",
-      "title": "QR code - what's behind this link?",
-      "year": 2026,
-      "category": "barcode",
-      "license": "CC0 (locally generated with qrencode)",
-      "source": "https://github.com/Arthur-Ficial/auge-web",
-      "wiki_file": null,
-      "local": true,
-      "filename": "qr-mystery.png",
-      "blurb": "Most QR codes you scan in the wild, you scan blind. auge decodes the URL on-device first - so you can read the destination before your phone does. Some links are surprises. Some are jokes. This one is a 38-year-old joke that still works.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
-      "id": "marie-curie",
-      "title": "Marie Curie, c. 1920",
-      "year": 1920,
-      "category": "faces",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Marie_Curie_c._1920s.jpg",
-      "wiki_file": "Marie_Curie_c._1920s.jpg",
-      "filename": "marie-curie.jpg",
-      "blurb": "The only person ever to win Nobel Prizes in two different sciences. auge detects the face and classifies the studio portrait.",
       "auge_args": [
         "--all"
       ]
@@ -207,6 +263,34 @@
       ]
     },
     {
+      "id": "sombrero-galaxy",
+      "title": "Sombrero Galaxy (M104) - Hubble",
+      "year": 2003,
+      "category": "classify",
+      "license": "Public Domain (NASA / ESA)",
+      "source": "https://commons.wikimedia.org/wiki/File:M104_ngc4594_sombrero_galaxy_hi-res.jpg",
+      "wiki_file": "M104_ngc4594_sombrero_galaxy_hi-res.jpg",
+      "filename": "sombrero-galaxy.jpg",
+      "blurb": "M104 in Virgo, 28 million light-years away. The dust lane edge-on gives it the namesake hat shape. Vision classifies 'galaxy / astronomy'.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "marie-curie",
+      "title": "Marie Curie, c. 1920",
+      "year": 1920,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Marie_Curie_c._1920s.jpg",
+      "wiki_file": "Marie_Curie_c._1920s.jpg",
+      "filename": "marie-curie.jpg",
+      "blurb": "The only person ever to win Nobel Prizes in two different sciences. auge detects the face and classifies the studio portrait.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
       "id": "klimt-kiss",
       "title": "The Kiss - Gustav Klimt, Vienna 1908",
       "year": 1908,
@@ -231,6 +315,34 @@
       "local": true,
       "filename": "ean13-supermarket.png",
       "blurb": "The barcode you see on every supermarket product. EAN-13 (European Article Number) is the global standard. This one encodes ISBN-13 9780201379624 - The Mythical Man-Month.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "eniac-1946",
+      "title": "Two women operating ENIAC, 1946",
+      "year": 1946,
+      "category": "faces",
+      "license": "Public Domain (US Army photo)",
+      "source": "https://commons.wikimedia.org/wiki/File:Two_women_operating_ENIAC_(full_resolution).jpg",
+      "wiki_file": "Two_women_operating_ENIAC_(full_resolution).jpg",
+      "filename": "eniac-1946.jpg",
+      "blurb": "Frances Bilas and Betty Jean Jennings - two of the six women who programmed ENIAC, the first general-purpose digital electronic computer, by physically rewiring it. The original software engineers.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "hubble-deep-field",
+      "title": "Hubble Ultra-Deep Field, 2004",
+      "year": 2004,
+      "category": "classify",
+      "license": "Public Domain (NASA / ESA)",
+      "source": "https://commons.wikimedia.org/wiki/File:Hubble_ultra_deep_field.jpg",
+      "wiki_file": "Hubble_ultra_deep_field.jpg",
+      "filename": "hubble-deep-field.jpg",
+      "blurb": "Eleven days of exposure in a single patch of sky one-tenth the diameter of a full moon. Roughly 10,000 galaxies, the most distant from when the universe was 800 million years old.",
       "auge_args": [
         "--all"
       ]

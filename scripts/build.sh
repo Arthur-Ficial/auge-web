@@ -33,6 +33,35 @@ fi
 
 echo "auge-web: building site/index.html (auge v$VERSION, $TEST_COUNT tests)..."
 
+# Compute corpus summary stats from data/*.json
+CORPUS_TOTAL=0
+CORPUS_FACES=0
+CORPUS_OCR=0
+CORPUS_BARCODES=0
+CORPUS_CLASSIFY=0
+declare -A LANG_SET=()
+
+for json_file in "$DATA"/*.json; do
+    [ -f "$json_file" ] || continue
+    CORPUS_TOTAL=$((CORPUS_TOTAL + 1))
+    f_count=$(jq -r '.results.faces.count // 0' "$json_file" 2>/dev/null)
+    [ "${f_count:-0}" -gt 0 ] && CORPUS_FACES=$((CORPUS_FACES + 1))
+    o_count=$(jq -r '.results.ocr.lines | length // 0' "$json_file" 2>/dev/null)
+    [ "${o_count:-0}" -gt 0 ] && CORPUS_OCR=$((CORPUS_OCR + 1))
+    b_count=$(jq -r '.results.barcodes.barcodes | length // 0' "$json_file" 2>/dev/null)
+    [ "${b_count:-0}" -gt 0 ] && CORPUS_BARCODES=$((CORPUS_BARCODES + 1))
+    c_count=$(jq -r '.results.classify.classifications | length // 0' "$json_file" 2>/dev/null)
+    [ "${c_count:-0}" -gt 0 ] && CORPUS_CLASSIFY=$((CORPUS_CLASSIFY + 1))
+done
+
+# Count distinct BCP-47 language tags from manifest auge_args (--langs values)
+LANG_COUNT=$(jq -r '.items[].auge_args | to_entries[] | select(.value == "--langs") as $f | input_filename' "$MANIFEST" 2>/dev/null | wc -l)
+# Simpler: extract --langs values directly
+LANG_COUNT=$(jq -r '.items[] | .auge_args as $a | range(0; $a|length) | select($a[.] == "--langs") | $a[. + 1]' "$MANIFEST" 2>/dev/null \
+  | tr ',' '\n' | sort -u | wc -l | tr -d ' ')
+
+echo "  corpus: $CORPUS_TOTAL items, $CORPUS_FACES with faces, $CORPUS_OCR with OCR, $CORPUS_BARCODES with barcodes, $CORPUS_CLASSIFY with classify, $LANG_COUNT languages"
+
 html_escape() { python3 -c 'import sys, html; print(html.escape(sys.stdin.read()), end="")'; }
 
 pretty_json_file() {
@@ -363,6 +392,12 @@ done
     -e "s|__VERSION__|$VERSION|g" \
     -e "s|__TEST_COUNT__|$TEST_COUNT|g" \
     -e "s|__GENERATED__|$GENERATED|g" \
+    -e "s|__CORPUS_TOTAL__|$CORPUS_TOTAL|g" \
+    -e "s|__CORPUS_FACES__|$CORPUS_FACES|g" \
+    -e "s|__CORPUS_OCR__|$CORPUS_OCR|g" \
+    -e "s|__CORPUS_BARCODES__|$CORPUS_BARCODES|g" \
+    -e "s|__CORPUS_CLASSIFY__|$CORPUS_CLASSIFY|g" \
+    -e "s|__CORPUS_LANGS__|$LANG_COUNT|g" \
   > "$SITE/index.html"
 
 echo ""
