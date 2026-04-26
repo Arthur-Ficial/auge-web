@@ -1,0 +1,18 @@
+# Generated outputs
+data/
+data.archive-*
+corpus/files/
+site/index.html
+site/index.html.archive-*
+site/images/
+
+# Local previews
+public/
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,100 @@
+{
+  "items": [
+    {
+      "id": "declaration-of-independence",
+      "title": "United States Declaration of Independence",
+      "year": 1776,
+      "category": "historical",
+      "license": "Public Domain (United States)",
+      "source": "https://commons.wikimedia.org/wiki/File:United_States_Declaration_of_Independence.jpg",
+      "wiki_file": "United_States_Declaration_of_Independence.jpg",
+      "filename": "declaration-of-independence.jpg",
+      "blurb": "The 1776 manuscript. Faded ink, dense colonial-era handwriting, irregular line spacing. auge runs every analysis at once — OCR, classification, barcodes, faces.",
+      "auge_args": ["--all", "--langs", "en-US", "--enhance"]
+    },
+    {
+      "id": "qr-code",
+      "title": "QR code — Wikipedia URL",
+      "year": 2024,
+      "category": "barcode",
+      "license": "CC0 (algorithmic)",
+      "source": "https://commons.wikimedia.org/wiki/File:QR_code_for_mobile_English_Wikipedia.svg",
+      "wiki_file": "QR_code_for_mobile_English_Wikipedia.svg",
+      "filename": "qr-wikipedia.png",
+      "blurb": "A QR code that decodes to Wikipedia's mobile URL. `auge --all` decodes the barcode and runs every other analysis on the same image, on-device, no camera, no network.",
+      "auge_args": ["--all"]
+    },
+    {
+      "id": "classify-cat",
+      "title": "Domestic cat",
+      "year": 2010,
+      "category": "classify",
+      "license": "CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:Cat_November_2010-1a.jpg",
+      "wiki_file": "Cat_November_2010-1a.jpg",
+      "filename": "cat.jpg",
+      "blurb": "Point auge at any image. It returns OCR text (none here), the top classification labels with confidence, faces, and barcodes — all in one pass.",
+      "auge_args": ["--all", "--top", "8"]
+    },
+    {
+      "id": "lincoln-portrait",
+      "title": "Abraham Lincoln, 1863",
+      "year": 1863,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+      "wiki_file": "Abraham_Lincoln_O-77_matte_collodion_print.jpg",
+      "filename": "lincoln.jpg",
+      "blurb": "A 19th-century portrait. auge detects the face (with bounding box), classifies the image, and OCRs any visible text — all from one command.",
+      "auge_args": ["--all"]
+    },
+    {
+      "id": "multilingual-sign",
+      "title": "Multilingual sign — Macau",
+      "year": 2010,
+      "category": "multilingual",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Multilingual_sign_in_Macau.png",
+      "wiki_file": "Multilingual_sign_in_Macau.png",
+      "filename": "multilingual-sign.png",
+      "blurb": "Chinese, Portuguese, and English on a single Macau sign. With `--langs en-US,pt-PT,zh-Hant`, auge handles all three scripts in one OCR pass — and runs every other analysis at the same time.",
+      "auge_args": ["--all", "--langs", "en-US,pt-PT,zh-Hant", "--enhance"]
+    },
+    {
+      "id": "old-map",
+      "title": "James Lyne's New York Survey (Bradford map)",
+      "year": 1730,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:James_Lyne%27s_survey,_or,_as_it_is_more_commonly_known,_The_Bradford_map;_(1900)_(14755665276).jpg",
+      "wiki_file": "James_Lyne's_survey,_or,_as_it_is_more_commonly_known,_The_Bradford_map;_(1900)_(14755665276).jpg",
+      "filename": "ny-bradford-map.jpg",
+      "blurb": "An 18th-century map of New York City. Tiny labels, decorative typefaces. `--enhance` upscales the small text before OCR; `--all` runs every analysis Vision can do.",
+      "auge_args": ["--all", "--enhance"]
+    },
+    {
+      "id": "einstein-roosevelt",
+      "title": "Einstein letter to Roosevelt, 1939",
+      "year": 1939,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Einstein-Roosevelt-letter.png",
+      "wiki_file": "Einstein-Roosevelt-letter.png",
+      "filename": "einstein-letter.png",
+      "blurb": "The 1939 Einstein–Szilárd letter to FDR that triggered the Manhattan Project. Typewritten English on aging paper. auge OCRs every line, classifies the page, and looks for faces and barcodes — one command, one image, everything back.",
+      "auge_args": ["--all", "--langs", "en-US"]
+    },
+    {
+      "id": "tribune-1865",
+      "title": "New-York Daily Tribune, July 1865",
+      "year": 1865,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:New-York_daily_tribune_(IA_newyorkdailyt18650718gree).pdf",
+      "wiki_file": "New-York_daily_tribune_(IA_newyorkdailyt18650718gree).pdf",
+      "filename": "ny-tribune-1865.pdf",
+      "blurb": "A real 1865 newspaper PDF from the Internet Archive. auge handles PDF natively via PDFKit (embedded text layer when present, rasterize for OCR otherwise) and runs every other analysis on each page.",
+      "auge_args": ["--all"]
+    }
+  ]
+}
