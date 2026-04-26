@@ -337,12 +337,22 @@ build_card() {
   license_e=$(echo "$license" | html_escape)
   source_e=$(echo "$source_url" | html_escape)
 
+  # Plain-text command for the click-to-reveal overlay (no HTML markup)
+  local plain_cmd="auge"
+  while IFS= read -r arg; do
+    plain_cmd+=" $arg"
+  done < <(echo "$args_json" | jq -r '.[]')
+  plain_cmd+=" $filename"
+  local plain_cmd_e
+  plain_cmd_e=$(echo "$plain_cmd" | html_escape)
+
   cat <<EOF
 <article class="card" id="$id">
-  <div class="card-image">
+  <div class="card-image" data-cmd="$plain_cmd_e" data-title="$title_e" tabindex="0" role="button" aria-label="Show instruction for $title_e">
     <div class="card-image-frame">
       <img src="images/$(echo "$display_filename" | html_escape)" alt="$title_e" loading="lazy">
 $(render_face_overlay "$json_file")
+      <div class="image-hint" aria-hidden="true">click to show instruction</div>
     </div>
   </div>
   <div class="card-body">
