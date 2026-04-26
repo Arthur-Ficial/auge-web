@@ -1,40 +1,79 @@
 {
   "items": [
     {
-      "id": "declaration-of-independence",
-      "title": "United States Declaration of Independence",
-      "year": 1776,
+      "id": "mona-lisa",
+      "title": "Mona Lisa - Leonardo da Vinci, 1503",
+      "year": 1503,
       "category": "historical",
-      "license": "Public Domain (United States)",
-      "source": "https://commons.wikimedia.org/wiki/File:United_States_Declaration_of_Independence.jpg",
-      "wiki_file": "United_States_Declaration_of_Independence.jpg",
-      "filename": "declaration-of-independence.jpg",
-      "blurb": "The 1776 manuscript. Faded ink, dense colonial-era handwriting, irregular line spacing. auge runs every analysis at once — OCR, classification, barcodes, faces.",
-      "auge_args": ["--all", "--langs", "en-US", "--enhance"]
+      "license": "Public Domain (Leonardo died 1519)",
+      "source": "https://commons.wikimedia.org/wiki/File:Mona_Lisa.jpg",
+      "wiki_file": "Mona_Lisa.jpg",
+      "filename": "mona-lisa.jpg",
+      "blurb": "Probably the most-recognized painting on Earth. auge detects her face and classifies the image - a useful sanity check for what Vision considers a 'painting' vs 'portrait'.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "multilingual-sign",
+      "title": "Multilingual sign - Macau",
+      "year": 2010,
+      "category": "multilingual",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Multilingual_sign_in_Macau.png",
+      "wiki_file": "Multilingual_sign_in_Macau.png",
+      "filename": "multilingual-sign.png",
+      "blurb": "Chinese, Portuguese, and English on a single Macau sign. With --langs, auge handles all three scripts in one OCR pass.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "en-US,pt-PT,zh-Hant",
+        "--enhance"
+      ]
+    },
+    {
+      "id": "frans-hals-banquet",
+      "title": "Banquet of the Officers of the St Hadrian Civic Guard - Frans Hals",
+      "year": 1627,
+      "category": "faces",
+      "license": "Public Domain (Hals died 1666)",
+      "source": "https://commons.wikimedia.org/wiki/File:Frans_Hals_-_Banquet_of_the_Officers_of_the_St_Hadrian_Civic_Guard_Company_-_WGA11092.jpg",
+      "wiki_file": "Frans_Hals_-_Banquet_of_the_Officers_of_the_St_Hadrian_Civic_Guard_Company_-_WGA11092.jpg",
+      "filename": "hals-banquet.jpg",
+      "blurb": "Twelve officers at a banquet, Haarlem 1627. Frans Hals founded the Dutch group portrait genre - eyes alive, faces individual. A perfect multi-face benchmark.",
+      "auge_args": [
+        "--all"
+      ]
     },
     {
       "id": "qr-code",
-      "title": "QR code — Wikipedia URL",
+      "title": "QR code - Wikipedia URL",
       "year": 2024,
       "category": "barcode",
       "license": "CC0 (algorithmic)",
       "source": "https://commons.wikimedia.org/wiki/File:QR_code_for_mobile_English_Wikipedia.svg",
       "wiki_file": "QR_code_for_mobile_English_Wikipedia.svg",
       "filename": "qr-wikipedia.png",
-      "blurb": "A QR code that decodes to Wikipedia's mobile URL. `auge --all` decodes the barcode and runs every other analysis on the same image, on-device, no camera, no network.",
-      "auge_args": ["--all"]
+      "blurb": "A QR code that decodes to Wikipedia's mobile URL. auge --all decodes the barcode and runs every other analysis on the same image, on-device, no camera, no network.",
+      "auge_args": [
+        "--all"
+      ]
     },
     {
-      "id": "classify-cat",
-      "title": "Domestic cat",
-      "year": 2010,
-      "category": "classify",
-      "license": "CC0",
-      "source": "https://commons.wikimedia.org/wiki/File:Cat_November_2010-1a.jpg",
-      "wiki_file": "Cat_November_2010-1a.jpg",
-      "filename": "cat.jpg",
-      "blurb": "Point auge at any image. It returns OCR text (none here), the top classification labels with confidence, faces, and barcodes — all in one pass.",
-      "auge_args": ["--all", "--top", "8"]
+      "id": "vatican-latin",
+      "title": "Vatican ATM with Latin instructions",
+      "year": 2014,
+      "category": "multilingual",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Vatican_ATM_in_Latin.jpg",
+      "wiki_file": "Vatican_ATM_in_Latin.jpg",
+      "filename": "vatican-atm.jpg",
+      "blurb": "The only ATM in the world with a Latin user interface. auge OCRs medieval-screen Latin: 'Inserito scidulam quaeso ut faciundam cognoscas rationem'.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "la,it-IT"
+      ]
     },
     {
       "id": "lincoln-portrait",
@@ -45,107 +84,70 @@
       "source": "https://commons.wikimedia.org/wiki/File:Abraham_Lincoln_O-77_matte_collodion_print.jpg",
       "wiki_file": "Abraham_Lincoln_O-77_matte_collodion_print.jpg",
       "filename": "lincoln.jpg",
-      "blurb": "A 19th-century portrait. auge detects the face (with bounding box), classifies the image, and OCRs any visible text — all from one command.",
-      "auge_args": ["--all"]
+      "blurb": "A 19th-century portrait. auge detects the face (with bounding box), classifies the image, and OCRs any visible text.",
+      "auge_args": [
+        "--all"
+      ]
     },
     {
-      "id": "multilingual-sign",
-      "title": "Multilingual sign — Macau",
+      "id": "rembrandt-anatomy",
+      "title": "The Anatomy Lesson of Dr Nicolaes Tulp - Rembrandt, 1632",
+      "year": 1632,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "wiki_file": "Rembrandt_-_The_Anatomy_Lesson_of_Dr_Nicolaes_Tulp.jpg",
+      "filename": "rembrandt-anatomy.jpg",
+      "blurb": "Rembrandt at 26, painting the Amsterdam Surgeons' Guild. Eight faces around a dissection - intimate, geometric, masterful. auge detects each one.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "classify-cat",
+      "title": "Domestic cat",
       "year": 2010,
-      "category": "multilingual",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Multilingual_sign_in_Macau.png",
-      "wiki_file": "Multilingual_sign_in_Macau.png",
-      "filename": "multilingual-sign.png",
-      "blurb": "Chinese, Portuguese, and English on a single Macau sign. With `--langs en-US,pt-PT,zh-Hant`, auge handles all three scripts in one OCR pass — and runs every other analysis at the same time.",
-      "auge_args": ["--all", "--langs", "en-US,pt-PT,zh-Hant", "--enhance"]
+      "category": "classify",
+      "license": "CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:Cat_November_2010-1a.jpg",
+      "wiki_file": "Cat_November_2010-1a.jpg",
+      "filename": "cat.jpg",
+      "blurb": "Point auge at any image. It returns OCR text (none here), the top classification labels with confidence, faces, and barcodes - all in one pass.",
+      "auge_args": [
+        "--all",
+        "--top",
+        "8"
+      ]
     },
     {
-      "id": "old-map",
-      "title": "James Lyne's New York Survey (Bradford map)",
-      "year": 1730,
-      "category": "historical",
+      "id": "hokusai-great-wave",
+      "title": "The Great Wave off Kanagawa - Hokusai, 1831",
+      "year": 1831,
+      "category": "classify",
       "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:James_Lyne%27s_survey,_or,_as_it_is_more_commonly_known,_The_Bradford_map;_(1900)_(14755665276).jpg",
-      "wiki_file": "James_Lyne's_survey,_or,_as_it_is_more_commonly_known,_The_Bradford_map;_(1900)_(14755665276).jpg",
-      "filename": "ny-bradford-map.jpg",
-      "blurb": "An 18th-century map of New York City. Tiny labels, decorative typefaces. `--enhance` upscales the small text before OCR; `--all` runs every analysis Vision can do.",
-      "auge_args": ["--all", "--enhance"]
+      "source": "https://commons.wikimedia.org/wiki/File:Tsunami_by_hokusai_19th_century.jpg",
+      "wiki_file": "Tsunami_by_hokusai_19th_century.jpg",
+      "filename": "hokusai-wave.jpg",
+      "blurb": "Hokusai's signature woodblock print from his Thirty-six Views of Mount Fuji. The most reproduced Japanese artwork ever made. Classify pulls 'art / painting / wave / sea'.",
+      "auge_args": [
+        "--all"
+      ]
     },
     {
-      "id": "einstein-roosevelt",
-      "title": "Einstein letter to Roosevelt, 1939",
-      "year": 1939,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Einstein-Roosevelt-letter.png",
-      "wiki_file": "Einstein-Roosevelt-letter.png",
-      "filename": "einstein-letter.png",
-      "blurb": "The 1939 Einstein–Szilárd letter to FDR that triggered the Manhattan Project. Typewritten English on aging paper. auge OCRs every line, classifies the page, and looks for faces and barcodes — one command, one image, everything back.",
-      "auge_args": ["--all", "--langs", "en-US"]
+      "id": "qr-rickroll",
+      "title": "QR code - Rick Roll",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated with qrencode)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "qr-rickroll.png",
+      "blurb": "A QR you almost certainly should not scan. auge --barcode reads it on-device so you know what's behind the link before opening it. (It's the song. Of course it's the song.)",
+      "auge_args": [
+        "--all"
+      ]
     },
-    {
-      "id": "tribune-1865",
-      "title": "New-York Daily Tribune, July 1865",
-      "year": 1865,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:New-York_daily_tribune_(IA_newyorkdailyt18650718gree).pdf",
-      "wiki_file": "New-York_daily_tribune_(IA_newyorkdailyt18650718gree).pdf",
-      "filename": "ny-tribune-1865.pdf",
-      "blurb": "A real 1865 newspaper PDF from the Internet Archive. auge handles PDF natively via PDFKit (embedded text layer when present, rasterize for OCR otherwise) and runs every other analysis on each page.",
-      "auge_args": ["--all"]
-    },
-
-    {
-      "id": "solvay-1927",
-      "title": "The Solvay Conference, Brussels 1927",
-      "year": 1927,
-      "category": "faces",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Solvay_conference_1927.jpg",
-      "wiki_file": "Solvay_conference_1927.jpg",
-      "filename": "solvay-1927.jpg",
-      "blurb": "Twenty-nine of the 20th century's greatest physicists in one frame: Einstein, Curie, Bohr, Heisenberg, Schrödinger, Dirac, Pauli, Lorentz. auge --faces detects and locates them all.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "yalta-1945",
-      "title": "Yalta Conference - Churchill, Roosevelt, Stalin",
-      "year": 1945,
-      "category": "faces",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Yalta_summit_1945_with_Churchill,_Roosevelt,_Stalin.jpg",
-      "wiki_file": "Yalta_summit_1945_with_Churchill,_Roosevelt,_Stalin.jpg",
-      "filename": "yalta-1945.jpg",
-      "blurb": "February 1945. The Big Three carving up post-war Europe. auge locates each face and runs full classification on the historic group portrait.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "versailles-signing",
-      "title": "Signing of the Treaty of Versailles, 1919",
-      "year": 1919,
-      "category": "faces",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Signing_of_the_Treaty_of_Versailles,_by_John_Christen_Johansen.jpg",
-      "wiki_file": "Signing_of_the_Treaty_of_Versailles,_by_John_Christen_Johansen.jpg",
-      "filename": "versailles-signing.jpg",
-      "blurb": "John Christen Johansen's 1919 painting of the Versailles signing - dozens of dignitaries packed into the Hall of Mirrors. A real test for face detection on painted faces, not just photos.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "abbey-road",
-      "title": "The Beatles - Abbey Road album cover, 1969",
-      "year": 1969,
-      "category": "faces",
-      "license": "Public Domain (cover image)",
-      "source": "https://commons.wikimedia.org/wiki/File:The_Beatles_Abbey_Road_album_cover.jpg",
-      "wiki_file": "The_Beatles_Abbey_Road_album_cover.jpg",
-      "filename": "abbey-road.jpg",
-      "blurb": "Lennon, Starr, McCartney, Harrison crossing Abbey Road. Four faces, one of the most-photographed crosswalks on Earth, classify pulls 'pedestrian crossing' and 'people'.",
-      "auge_args": ["--all"]
-    },
-
     {
       "id": "marie-curie",
       "title": "Marie Curie, c. 1920",
@@ -156,80 +158,9 @@
       "wiki_file": "Marie_Curie_c._1920s.jpg",
       "filename": "marie-curie.jpg",
       "blurb": "The only person ever to win Nobel Prizes in two different sciences. auge detects the face and classifies the studio portrait.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "freud-portrait",
-      "title": "Sigmund Freud, photographed for LIFE",
-      "year": 1939,
-      "category": "faces",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Sigmund_Freud_LIFE.jpg",
-      "wiki_file": "Sigmund_Freud_LIFE.jpg",
-      "filename": "freud.jpg",
-      "blurb": "The founder of psychoanalysis in his Vienna study. Sharp portrait, ideal for face bounding-box demonstration.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "mozart-portrait",
-      "title": "Mozart, by Lange (unfinished, 1782)",
-      "year": 1782,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Mozart_(unfinished)_by_Lange_1782.jpg",
-      "wiki_file": "Mozart_(unfinished)_by_Lange_1782.jpg",
-      "filename": "mozart.jpg",
-      "blurb": "Joseph Lange's unfinished oil portrait of his brother-in-law - widely considered the most accurate likeness of Mozart. auge detects the painted face.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "beethoven-portrait",
-      "title": "Beethoven with the Missa solemnis manuscript",
-      "year": 1820,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Joseph_Karl_Stieler%27s_Beethoven_mit_dem_Manuskript_der_Missa_solemnis.jpg",
-      "wiki_file": "Joseph_Karl_Stieler's_Beethoven_mit_dem_Manuskript_der_Missa_solemnis.jpg",
-      "filename": "beethoven.jpg",
-      "blurb": "Stieler's 1820 portrait. Possible to OCR the manuscript score in his hand? auge runs every analysis to find out.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "goethe-campagna",
-      "title": "Goethe in the Roman Campagna (Tischbein, 1787)",
-      "year": 1787,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Johann_Heinrich_Wilhelm_Tischbein_-_Goethe_in_der_roemischen_Campagna.jpg",
-      "wiki_file": "Johann_Heinrich_Wilhelm_Tischbein_-_Goethe_in_der_roemischen_Campagna.jpg",
-      "filename": "goethe-campagna.jpg",
-      "blurb": "The icon of Weimar Classicism. Tischbein painted his friend Goethe reclining among Roman ruins - face detection on a 240-year-old oil painting.",
-      "auge_args": ["--all"]
-    },
-
-    {
-      "id": "mona-lisa",
-      "title": "Mona Lisa - Leonardo da Vinci",
-      "year": 1503,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Mona_Lisa.jpg",
-      "wiki_file": "Mona_Lisa.jpg",
-      "filename": "mona-lisa.jpg",
-      "blurb": "Probably the most-recognized painting on Earth. auge detects her face and classifies the image - a useful sanity check for what Vision considers a 'painting' vs 'portrait'.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "klimt-kiss",
-      "title": "The Kiss - Gustav Klimt, Vienna 1908",
-      "year": 1908,
-      "category": "classify",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:The_Kiss_by_Gustav_Klimt.jpg",
-      "wiki_file": "The_Kiss_by_Gustav_Klimt.jpg",
-      "filename": "klimt-kiss.jpg",
-      "blurb": "Klimt's gold-leaf masterpiece in the Belvedere, Vienna. A genuine challenge for Vision: heavy ornament, abstract gold, two faces partially visible.",
-      "auge_args": ["--all"]
+      "auge_args": [
+        "--all"
+      ]
     },
     {
       "id": "vermeer-pearl",
@@ -241,7 +172,96 @@
       "wiki_file": "1665_Girl_with_a_Pearl_Earring.jpg",
       "filename": "vermeer-pearl.jpg",
       "blurb": "The 'Mona Lisa of the North'. The bounding box should fit her tilted face cleanly - a good test of normalized-coordinate accuracy.",
-      "auge_args": ["--all"]
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "tribune-1865",
+      "title": "New-York Daily Tribune, 1865",
+      "year": 1865,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:New-York_daily_tribune_(IA_newyorkdailyt18650718gree).pdf",
+      "wiki_file": "New-York_daily_tribune_(IA_newyorkdailyt18650718gree).pdf",
+      "filename": "ny-tribune-1865.pdf",
+      "blurb": "A real 1865 newspaper PDF from the Internet Archive. auge handles PDF natively via PDFKit and runs every other analysis on each page.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "welsh-english-sign",
+      "title": "Welsh-English no-parking sign, Wales",
+      "year": 2010,
+      "category": "multilingual",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Bilingual_English-Welsh_no_parking_sign.jpg",
+      "wiki_file": "Bilingual_English-Welsh_no_parking_sign.jpg",
+      "filename": "welsh-english-sign.jpg",
+      "blurb": "Welsh signage law requires every public sign to be bilingual. auge --langs cy,en-GB OCRs both 'Dim Parcio' and 'No Parking' in one pass.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "cy,en-GB"
+      ]
+    },
+    {
+      "id": "klimt-kiss",
+      "title": "The Kiss - Gustav Klimt, Vienna 1908",
+      "year": 1908,
+      "category": "classify",
+      "license": "Public Domain (Klimt died 1918)",
+      "source": "https://commons.wikimedia.org/wiki/File:The_Kiss_by_Gustav_Klimt.jpg",
+      "wiki_file": "The_Kiss_by_Gustav_Klimt.jpg",
+      "filename": "klimt-kiss.jpg",
+      "blurb": "Klimt's gold-leaf masterpiece in the Belvedere, Vienna. A genuine challenge for Vision: heavy ornament, abstract gold, two faces partially visible.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "barcode-ean13",
+      "title": "EAN-13 supermarket barcode",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated, real ISBN-13 of The Mythical Man-Month)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "ean13-supermarket.png",
+      "blurb": "The barcode you see on every supermarket product. EAN-13 (European Article Number) is the global standard. This one encodes ISBN-13 9780201379624 - The Mythical Man-Month.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "goethe-campagna",
+      "title": "Goethe in the Roman Campagna - Tischbein, 1787",
+      "year": 1787,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Johann_Heinrich_Wilhelm_Tischbein_-_Goethe_in_der_roemischen_Campagna.jpg",
+      "wiki_file": "Johann_Heinrich_Wilhelm_Tischbein_-_Goethe_in_der_roemischen_Campagna.jpg",
+      "filename": "goethe-campagna.jpg",
+      "blurb": "The icon of Weimar Classicism. Tischbein painted his friend Goethe reclining among Roman ruins - face detection on a 240-year-old oil painting.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "audubon-bird",
+      "title": "Bird of Washington - John James Audubon, 1838",
+      "year": 1838,
+      "category": "classify",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:John_James_Audubons_Birds_of_America_-_Plate_76_(Detail).jpg",
+      "wiki_file": "John_James_Audubons_Birds_of_America_-_Plate_76_(Detail).jpg",
+      "filename": "audubon-bird.jpg",
+      "blurb": "From Audubon's Birds of America - the most expensive printed book in the world (a complete copy sold for $11.5M in 2010). Hand-coloured engraving of a bird that may not have existed.",
+      "auge_args": [
+        "--all"
+      ]
     },
     {
       "id": "bruegel-hunters",
@@ -253,129 +273,23 @@
       "wiki_file": "Pieter_Bruegel_the_Elder_-_Hunters_in_the_Snow_(Winter)_-_Google_Art_Project.jpg",
       "filename": "bruegel-hunters.jpg",
       "blurb": "Bruegel's January from his Months series. A complex Flemish winter scene - perfect for stress-testing classification (snow, hunters, dogs, village, ice skating).",
-      "auge_args": ["--all"]
+      "auge_args": [
+        "--all"
+      ]
     },
     {
-      "id": "friedrich-wanderer",
-      "title": "Wanderer above the Sea of Fog - C.D. Friedrich, 1818",
-      "year": 1818,
-      "category": "classify",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
-      "wiki_file": "Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
-      "filename": "friedrich-wanderer.jpg",
-      "blurb": "The defining image of German Romanticism. A solitary figure above mountain mist - auge tries face detection (back of head, no face visible) and classify on a Romantic landscape.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "holbein-ambassadors",
-      "title": "The Ambassadors - Hans Holbein, 1533",
-      "year": 1533,
+      "id": "mozart-portrait",
+      "title": "Mozart, by Lange (unfinished, 1782)",
+      "year": 1782,
       "category": "faces",
       "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
-      "wiki_file": "Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
-      "filename": "holbein-ambassadors.jpg",
-      "blurb": "Two French ambassadors at the court of Henry VIII, surrounded by symbols of learning - and the famous anamorphic skull. Two faces, dense iconography, OCR may pick up the celestial globe inscriptions.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "durer-rhinoceros",
-      "title": "Dürer's Rhinoceros (woodcut, 1515)",
-      "year": 1515,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Albrecht_D%C3%BCrer,_The_Rhinoceros,_1515,_NGA_47903.jpg",
-      "wiki_file": "Albrecht Dürer, The Rhinoceros, 1515, NGA 47903.jpg",
-      "filename": "durer-rhinoceros.jpg",
-      "blurb": "Dürer's woodcut of an Indian rhinoceros - drawn from a written description, never seen in person. Above it: a Latin inscription. auge OCRs the inscription and classifies the engraving.",
-      "auge_args": ["--all", "--enhance"]
-    },
-
-    {
-      "id": "eiffel-tower",
-      "title": "Eiffel Tower, Paris",
-      "year": 2010,
-      "category": "classify",
-      "license": "CC0",
-      "source": "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons.jpg",
-      "wiki_file": "Tour_Eiffel_Wikimedia_Commons.jpg",
-      "filename": "eiffel-tower.jpg",
-      "blurb": "1,083 feet of wrought iron. Classify identifies it - and Vision is good enough to recognize specific landmarks in its training set.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "colosseum",
-      "title": "Colosseum, Rome",
-      "year": 2007,
-      "category": "classify",
-      "license": "CC0",
-      "source": "https://commons.wikimedia.org/wiki/File:Colosseum_in_Rome,_Italy_-_April_2007.jpg",
-      "wiki_file": "Colosseum_in_Rome, Italy - April 2007.jpg",
-      "filename": "colosseum.jpg",
-      "blurb": "The Flavian Amphitheatre, opened 80 AD. Classify nails 'amphitheatre / ruin / arena' - and auge probably detects faces in the tourist crowd.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "notre-dame-paris",
-      "title": "Notre-Dame de Paris, west façade",
-      "year": 2014,
-      "category": "classify",
-      "license": "CC0",
-      "source": "https://commons.wikimedia.org/wiki/File:Notre_Dame_Paris_front_facade_lower.jpg",
-      "wiki_file": "Notre_Dame_Paris_front_facade_lower.jpg",
-      "filename": "notre-dame.jpg",
-      "blurb": "The Gothic west façade, before the 2019 fire. Sculpture-dense - auge looks for faces in the carved statues alongside cathedral classification.",
-      "auge_args": ["--all"]
-    },
-    {
-      "id": "vienna-opera",
-      "title": "Vienna State Opera House",
-      "year": 2006,
-      "category": "classify",
-      "license": "CC0",
-      "source": "https://commons.wikimedia.org/wiki/File:Exterior_of_Vienna_State_Opera_House.jpg",
-      "wiki_file": "Exterior_of_Vienna_State_Opera_House.jpg",
-      "filename": "vienna-opera.jpg",
-      "blurb": "The Wiener Staatsoper, opened 1869. Neo-Renaissance architecture, classified by auge with crisp confidence.",
-      "auge_args": ["--all"]
-    },
-
-    {
-      "id": "magna-carta",
-      "title": "Magna Carta - 1215, British Library copy",
-      "year": 1215,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Magna_Carta_(British_Library_Cotton_MS_Augustus_II.106).jpg",
-      "wiki_file": "Magna_Carta_(British_Library_Cotton_MS_Augustus_II.106).jpg",
-      "filename": "magna-carta.jpg",
-      "blurb": "The 1215 charter that limited the English king's power. Medieval Latin script in dense lines - extreme OCR difficulty. Apple's model attempts it anyway.",
-      "auge_args": ["--all", "--enhance"]
-    },
-    {
-      "id": "rosetta-stone",
-      "title": "The Rosetta Stone (196 BC)",
-      "year": -196,
-      "category": "multilingual",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Rosetta_Stone.JPG",
-      "wiki_file": "Rosetta_Stone.JPG",
-      "filename": "rosetta-stone.jpg",
-      "blurb": "The same decree in three scripts - hieroglyphic, demotic Egyptian, ancient Greek. The original multilingual document. auge OCRs the visible Greek section with --langs el-GR.",
-      "auge_args": ["--all", "--langs", "el-GR,en-US", "--enhance"]
-    },
-    {
-      "id": "gutenberg-bible",
-      "title": "Gutenberg Bible page (c. 1455)",
-      "year": 1455,
-      "category": "historical",
-      "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Gutenberg_Bible_(page).JPG",
-      "wiki_file": "Gutenberg_Bible_(page).JPG",
-      "filename": "gutenberg-bible.jpg",
-      "blurb": "The first major book printed with movable type in Europe. Latin Vulgate in blackletter, two columns, illuminated. auge OCRs the Latin text with --langs la.",
-      "auge_args": ["--all", "--langs", "la,en-US"]
+      "source": "https://commons.wikimedia.org/wiki/File:Mozart_(unfinished)_by_Lange_1782.jpg",
+      "wiki_file": "Mozart_(unfinished)_by_Lange_1782.jpg",
+      "filename": "mozart.jpg",
+      "blurb": "Joseph Lange's unfinished oil portrait of his brother-in-law - widely considered the most accurate likeness of Mozart. auge detects the painted face.",
+      "auge_args": [
+        "--all"
+      ]
     },
     {
       "id": "brussels-bilingual",
@@ -387,31 +301,485 @@
       "wiki_file": "Bilingual_(French-Dutch)_signs_in_Brussels.jpg",
       "filename": "brussels-bilingual.jpg",
       "blurb": "Brussels has been officially bilingual since 1932. auge --langs fr-FR,nl-NL handles both scripts on the same sign in one pass.",
-      "auge_args": ["--all", "--langs", "fr-FR,nl-NL"]
+      "auge_args": [
+        "--all",
+        "--langs",
+        "fr-FR,nl-NL"
+      ]
     },
     {
-      "id": "vatican-latin",
-      "title": "Vatican ATM with Latin instructions",
+      "id": "qr-vcard",
+      "title": "QR code - vCard contact",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "qr-vcard.png",
+      "blurb": "A vCard 3.0 contact card encoded in a QR. auge decodes the multi-line text and you can save it as a contact - all without touching the cloud.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "eiffel-tower",
+      "title": "Eiffel Tower, Paris",
+      "year": 2010,
+      "category": "classify",
+      "license": "CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons.jpg",
+      "wiki_file": "Tour_Eiffel_Wikimedia_Commons.jpg",
+      "filename": "eiffel-tower.jpg",
+      "blurb": "1,083 feet of wrought iron. Classify identifies it - and Vision is good enough to recognise specific landmarks in its training set.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "beethoven-portrait",
+      "title": "Beethoven with the Missa solemnis manuscript",
+      "year": 1820,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Joseph_Karl_Stieler%27s_Beethoven_mit_dem_Manuskript_der_Missa_solemnis.jpg",
+      "wiki_file": "Joseph_Karl_Stieler's_Beethoven_mit_dem_Manuskript_der_Missa_solemnis.jpg",
+      "filename": "beethoven.jpg",
+      "blurb": "Stieler's 1820 portrait. Possible to OCR the manuscript score in his hand? auge runs every analysis to find out.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "jaffa-trilingual",
+      "title": "Trilingual sign in Jaffa: Arabic, Hebrew, English",
+      "year": 2009,
+      "category": "multilingual",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Sign_in_Jaffa,_Israel,_in_English,_Arabic,_and_Hebrew.jpg",
+      "wiki_file": "Sign_in_Jaffa,_Israel,_in_English,_Arabic,_and_Hebrew.jpg",
+      "filename": "jaffa-trilingual.jpg",
+      "blurb": "Three scripts (Latin, Arabic abjad, Hebrew abjad) on a single street sign in Jaffa. A serious test of right-to-left + multi-script OCR.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "en-US,ar,he"
+      ]
+    },
+    {
+      "id": "steinlen-cat",
+      "title": "Tournée du Chat Noir - Steinlen, 1896",
+      "year": 1896,
+      "category": "multilingual",
+      "license": "Public Domain (Steinlen died 1923)",
+      "source": "https://commons.wikimedia.org/wiki/File:PP_D117_poster_by_steinlen_for_pure_milk_and_nestle%27s_swiss_milk.jpg",
+      "wiki_file": "Affiche_Steinlen_1.jpg",
+      "filename": "steinlen-cat.jpg",
+      "blurb": "Steinlen's Belle-Époque poster of a giant black cat over Montmartre. A founding piece of poster art and one of the most-reproduced cat images in history. OCRs the French title.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "fr-FR"
+      ]
+    },
+    {
+      "id": "holbein-ambassadors",
+      "title": "The Ambassadors - Hans Holbein, 1533",
+      "year": 1533,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
+      "wiki_file": "Hans_Holbein_the_Younger_-_The_Ambassadors_-_Google_Art_Project.jpg",
+      "filename": "holbein-ambassadors.jpg",
+      "blurb": "Two French ambassadors at the court of Henry VIII, surrounded by symbols of learning - and the famous anamorphic skull. Two faces, dense iconography.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "south-tyrol-sign",
+      "title": "Sterzing / Vipiteno - South Tyrol bilingual sign",
       "year": 2014,
       "category": "multilingual",
       "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Vatican_ATM_in_Latin.jpg",
-      "wiki_file": "Vatican_ATM_in_Latin.jpg",
-      "filename": "vatican-atm.jpg",
-      "blurb": "The only ATM in the world with a Latin user interface. Inserito scidulam quaeso ut faciundam cognoscas rationem. auge OCRs medieval-screen Latin.",
-      "auge_args": ["--all", "--langs", "la,it-IT"]
+      "source": "https://commons.wikimedia.org/wiki/File:Sterzing_Vipiteno_sign_01.JPG",
+      "wiki_file": "Sterzing_Vipiteno_sign_01.JPG",
+      "filename": "south-tyrol-sign.jpg",
+      "blurb": "South Tyrol road sign: every place name in German and Italian. Sterzing in German, Vipiteno in Italian, same town. auge --langs de-DE,it-IT.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "de-DE,it-IT"
+      ]
     },
     {
-      "id": "frankfurter-zeitung",
-      "title": "Frankfurter Zeitung article, February 1936",
-      "year": 1936,
+      "id": "stubbs-horse",
+      "title": "Anatomy of the Horse - George Stubbs, 1766",
+      "year": 1766,
+      "category": "classify",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Stubbs_Anatomy_of_the_Horse_2.JPG",
+      "wiki_file": "Stubbs_Anatomy_of_the_Horse_2.JPG",
+      "filename": "stubbs-horse.jpg",
+      "blurb": "George Stubbs spent 18 months dissecting horses to draw them perfectly. The resulting 1766 atlas is half scientific document, half love letter to the animal.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "barcode-upc",
+      "title": "UPC-A grocery barcode",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "upca-grocery.png",
+      "blurb": "UPC-A is the 12-digit barcode used on most US groceries. auge --barcode reports it normalised to EAN-13 with a leading zero - same number, same on-device decoder.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "vienna-opera",
+      "title": "Vienna State Opera House",
+      "year": 2006,
+      "category": "classify",
+      "license": "CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:Exterior_of_Vienna_State_Opera_House.jpg",
+      "wiki_file": "Exterior_of_Vienna_State_Opera_House.jpg",
+      "filename": "vienna-opera.jpg",
+      "blurb": "The Wiener Staatsoper, opened 1869. Neo-Renaissance architecture, classified by auge with crisp confidence.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "qr-outdoor-conwy",
+      "title": "QR code on Conwy street info sign (UK, outdoor)",
+      "year": 2012,
+      "category": "barcode",
+      "license": "CC BY-SA 2.0 (Geograph)",
+      "source": "https://commons.wikimedia.org/wiki/File:HiPoints_information_QR_code_on_Lower_Gate_Street,_Conwy_-_geograph.org.uk_-_3126912.jpg",
+      "wiki_file": "HiPoints_information_QR_code_on_Lower_Gate_Street,_Conwy_-_geograph.org.uk_-_3126912.jpg",
+      "filename": "qr-outdoor-conwy.jpg",
+      "blurb": "A real-world outdoor QR code on a tourist information sign in Conwy, Wales. auge decodes the URL plus picks up the surrounding sign text.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "colosseum",
+      "title": "Colosseum, Rome",
+      "year": 2007,
+      "category": "classify",
+      "license": "CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:Colosseum_in_Rome,_Italy_-_April_2007.jpg",
+      "wiki_file": "Colosseum_in_Rome, Italy - April 2007.jpg",
+      "filename": "colosseum.jpg",
+      "blurb": "The Flavian Amphitheatre, opened 80 AD. Classify nails 'amphitheatre / ruin / arena' - and auge probably detects faces in the tourist crowd.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "notre-dame-paris",
+      "title": "Notre-Dame de Paris, west façade",
+      "year": 2014,
+      "category": "classify",
+      "license": "CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:Notre_Dame_Paris_front_facade_lower.jpg",
+      "wiki_file": "Notre_Dame_Paris_front_facade_lower.jpg",
+      "filename": "notre-dame.jpg",
+      "blurb": "The Gothic west façade, before the 2019 fire. Sculpture-dense - auge looks for faces in the carved statues alongside cathedral classification.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "edwards-dodo",
+      "title": "The Dodo - George Edwards, 1759",
+      "year": 1759,
+      "category": "classify",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:The_dodo_%26_given_by_G.Edwards_1759.jpg",
+      "wiki_file": "The_dodo_&_given_by_G.Edwards_1759.jpg",
+      "filename": "edwards-dodo.jpg",
+      "blurb": "George Edwards's 1759 illustration of a Dodo - an animal already extinct for nearly a century when he drew it, from a Dutch painting. The most charming dead bird in art history.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "belgrade-cyrillic",
+      "title": "Belgrade street sign - Cyrillic and Latin",
+      "year": 2009,
+      "category": "multilingual",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:George_Washington_Street_sign_Belgrade.JPG",
+      "wiki_file": "George_Washington_Street_sign_Belgrade.JPG",
+      "filename": "belgrade-cyrillic.jpg",
+      "blurb": "Serbia uses both Cyrillic and Latin scripts officially. This Belgrade plate names George Washington in both alphabets. auge OCRs sr-Cyrl + sr-Latn at the same time.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "sr-Cyrl,sr-Latn,en-US"
+      ]
+    },
+    {
+      "id": "datamatrix-milk",
+      "title": "DataMatrix code on a bottle of milk",
+      "year": 2018,
+      "category": "barcode",
+      "license": "CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:DataMatrix_code_on_a_bottle_of_milk.jpg",
+      "wiki_file": "DataMatrix_code_on_a_bottle_of_milk.jpg",
+      "filename": "datamatrix-milk.jpg",
+      "blurb": "A real DataMatrix barcode in the wild - on a milk bottle. Vision recognises this format alongside QR, EAN, Code128, PDF417, and Aztec.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "barcode-code128",
+      "title": "Code 128 industrial barcode",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "code128-isbn.png",
+      "blurb": "Code 128 encodes ASCII letters and numbers - used on shipping labels, hospital wristbands, and warehouse pallets. Vision decodes all of these one-dimensional symbologies on-device.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "qr-wifi",
+      "title": "QR code - WiFi network access",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "qr-wifi.png",
+      "blurb": "Modern QR codes encode WiFi credentials in a single scan. auge --barcode decodes the WIFI: schema URI - on-device, never reaching out to the internet.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "qr-haiku",
+      "title": "QR code - Bashō haiku",
+      "year": 2026,
+      "category": "barcode",
+      "license": "CC0 (locally generated, haiku 1686 PD)",
+      "source": "https://github.com/Arthur-Ficial/auge-web",
+      "wiki_file": null,
+      "local": true,
+      "filename": "qr-haiku.png",
+      "blurb": "Matsuo Bashō's most famous haiku from 1686, encoded in a QR. auge decodes the multi-line text. The haiku itself is older than the United States.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "durer-rhinoceros",
+      "title": "Dürer's Rhinoceros (woodcut, 1515)",
+      "year": 1515,
       "category": "historical",
       "license": "Public Domain",
-      "source": "https://commons.wikimedia.org/wiki/File:Zeitungsartikel_%C3%BCber_Hans_Knappertsbusch,_Frankfurter_Zeitung_26._Feb._1936.png",
-      "wiki_file": "Zeitungsartikel über Hans Knappertsbusch, Frankfurter Zeitung 26. Feb. 1936.png",
-      "filename": "frankfurter-zeitung-1936.png",
-      "blurb": "A 1936 German newspaper article in Fraktur typeface. Pre-war Frankfurter Zeitung, dense gothic blackletter - extremely hard for OCR. Vision attempts it.",
-      "auge_args": ["--all", "--langs", "de-DE", "--enhance"]
+      "source": "https://commons.wikimedia.org/wiki/File:Albrecht_D%C3%BCrer,_The_Rhinoceros,_1515,_NGA_47903.jpg",
+      "wiki_file": "Albrecht Dürer, The Rhinoceros, 1515, NGA 47903.jpg",
+      "filename": "durer-rhinoceros.jpg",
+      "blurb": "Dürer's woodcut of an Indian rhinoceros - drawn from a written description, never seen in person. Above it: a Latin inscription. auge OCRs the inscription.",
+      "auge_args": [
+        "--all",
+        "--enhance"
+      ]
+    },
+    {
+      "id": "gutenberg-bible",
+      "title": "Gutenberg Bible page (c. 1455)",
+      "year": 1455,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Gutenberg_Bible_(page).JPG",
+      "wiki_file": "Gutenberg_Bible_(page).JPG",
+      "filename": "gutenberg-bible.jpg",
+      "blurb": "The first major book printed with movable type in Europe. Latin Vulgate in blackletter, two columns, illuminated. auge OCRs the Latin text with --langs la.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "la,en-US"
+      ]
+    },
+    {
+      "id": "declaration-of-independence",
+      "title": "United States Declaration of Independence, 1776",
+      "year": 1776,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:United_States_Declaration_of_Independence.jpg",
+      "wiki_file": "United_States_Declaration_of_Independence.jpg",
+      "filename": "declaration-of-independence.jpg",
+      "blurb": "The 1776 manuscript. Faded ink, dense colonial-era handwriting, irregular line spacing. auge runs every analysis at once.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "en-US",
+        "--enhance"
+      ]
+    },
+    {
+      "id": "old-map",
+      "title": "James Lyne's New York Survey (Bradford map), c. 1730",
+      "year": 1730,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:James_Lyne%27s_survey,_or,_as_it_is_more_commonly_known,_The_Bradford_map;_(1900)_(14755665276).jpg",
+      "wiki_file": "James_Lyne's_survey,_or,_as_it_is_more_commonly_known,_The_Bradford_map;_(1900)_(14755665276).jpg",
+      "filename": "ny-bradford-map.jpg",
+      "blurb": "An 18th-century map of New York City. Tiny labels, decorative typefaces. Real adversarial input - --enhance upscales tiny lines.",
+      "auge_args": [
+        "--all",
+        "--enhance"
+      ]
+    },
+    {
+      "id": "rosetta-stone",
+      "title": "The Rosetta Stone (196 BC)",
+      "year": -196,
+      "category": "multilingual",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Rosetta_Stone.JPG",
+      "wiki_file": "Rosetta_Stone.JPG",
+      "filename": "rosetta-stone.jpg",
+      "blurb": "The same decree in three scripts - hieroglyphic, demotic Egyptian, ancient Greek. The original multilingual document. auge OCRs the visible Greek section with --langs el-GR.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "el-GR,en-US",
+        "--enhance"
+      ]
+    },
+    {
+      "id": "magna-carta",
+      "title": "Magna Carta - 1215, British Library copy",
+      "year": 1215,
+      "category": "historical",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Magna_Carta_(British_Library_Cotton_MS_Augustus_II.106).jpg",
+      "wiki_file": "Magna_Carta_(British_Library_Cotton_MS_Augustus_II.106).jpg",
+      "filename": "magna-carta.jpg",
+      "blurb": "The 1215 charter that limited the English king's power. Medieval Latin script in dense lines - extreme OCR difficulty. Apple's model attempts it anyway.",
+      "auge_args": [
+        "--all",
+        "--enhance"
+      ]
+    },
+    {
+      "id": "leonardo-last-supper",
+      "title": "The Last Supper - Leonardo da Vinci, 1498",
+      "year": 1498,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_(1452-1519)_-_The_Last_Supper_(1495-1498).jpg",
+      "wiki_file": "Leonardo_da_Vinci_(1452-1519)_-_The_Last_Supper_(1495-1498).jpg",
+      "filename": "last-supper.jpg",
+      "blurb": "Leonardo's mural in the refectory of Santa Maria delle Grazie, Milan. Thirteen named figures arranged with mathematical precision. auge counts the apostles.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "raphael-school-athens",
+      "title": "The School of Athens - Raphael, 1511",
+      "year": 1511,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg",
+      "wiki_file": "\"The_School_of_Athens\"_by_Raffaello_Sanzio_da_Urbino.jpg",
+      "filename": "raphael-athens.jpg",
+      "blurb": "Raphael's 1511 fresco in the Vatican: Plato, Aristotle, Socrates, Pythagoras, Euclid, Diogenes - twenty-some philosophers in one room. auge counts the faces and classifies the architecture.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "rembrandt-night-watch",
+      "title": "The Night Watch - Rembrandt, 1642",
+      "year": 1642,
+      "category": "faces",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg",
+      "wiki_file": "The_Nightwatch_by_Rembrandt_-_Rijksmuseum.jpg",
+      "filename": "rembrandt-nightwatch.jpg",
+      "blurb": "Rembrandt's monumental civic guard portrait at the Rijksmuseum. Eighteen named figures plus several extras. A genuine stress test for face detection on chiaroscuro paintings.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "friedrich-wanderer",
+      "title": "Wanderer above the Sea of Fog - Caspar David Friedrich, 1818",
+      "year": 1818,
+      "category": "classify",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+      "wiki_file": "Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+      "filename": "friedrich-wanderer.jpg",
+      "blurb": "The defining image of German Romanticism. A solitary figure above mountain mist - auge tries face detection (back of head, no face visible) and classify on a Romantic landscape.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "solvay-1927",
+      "title": "The Solvay Conference, Brussels 1927",
+      "year": 1927,
+      "category": "faces",
+      "license": "Public Domain (anonymous, 70+ years)",
+      "source": "https://commons.wikimedia.org/wiki/File:Solvay_conference_1927.jpg",
+      "wiki_file": "Solvay_conference_1927.jpg",
+      "filename": "solvay-1927.jpg",
+      "blurb": "Twenty-nine of the 20th century's greatest physicists in one frame: Einstein, Curie, Bohr, Heisenberg, Schrödinger, Dirac, Pauli, Lorentz. auge --faces detects and locates them.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "qr-outdoor-china",
+      "title": "Chinese road sign with QR code (Hainan, outdoor)",
+      "year": 2025,
+      "category": "barcode",
+      "license": "Public Domain / CC0",
+      "source": "https://commons.wikimedia.org/wiki/File:Chinese_road_sign_with_QR_code_(Hainan_2025).jpg",
+      "wiki_file": "Chinese_road_sign_with_QR_code_(Hainan_2025).jpg",
+      "filename": "qr-outdoor-china.jpg",
+      "blurb": "A real outdoor QR code in the wild - on a Chinese highway sign. auge decodes the URL plus extracts the Mandarin text alongside it. One image, every analysis.",
+      "auge_args": [
+        "--all",
+        "--langs",
+        "zh-Hans,en-US"
+      ]
+    },
+    {
+      "id": "landseer-dignity",
+      "title": "Dignity and Impudence - Edwin Landseer, 1839",
+      "year": 1839,
+      "category": "classify",
+      "license": "Public Domain",
+      "source": "https://commons.wikimedia.org/wiki/File:Dignity.and.impudence.jpg",
+      "wiki_file": "Dignity.and.impudence.jpg",
+      "filename": "landseer-dogs.jpg",
+      "blurb": "A sad-eyed bloodhound and a cheeky terrier. Landseer was Queen Victoria's favourite painter. auge classifies the dogs (very accurately) - and may try face-detection on dog faces.",
+      "auge_args": [
+        "--all"
+      ]
     }
   ]
 }

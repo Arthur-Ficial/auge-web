@@ -19,7 +19,19 @@ for i in $(seq 0 $((count - 1))); do
     id=$(jq -r ".items[$i].id" "$MANIFEST")
     wiki_file=$(jq -r ".items[$i].wiki_file" "$MANIFEST")
     filename=$(jq -r ".items[$i].filename" "$MANIFEST")
+    is_local=$(jq -r ".items[$i].local // false" "$MANIFEST")
     target="$DEST/$filename"
+
+    # Locally generated items (e.g. QR codes via qrencode) are pre-placed
+    # under corpus/files/ — skip remote resolution.
+    if [ "$is_local" = "true" ]; then
+        if [ -f "$target" ] && [ -s "$target" ]; then
+            printf "  %-40s [local]\n" "$id"
+        else
+            printf "  %-40s [LOCAL MISSING %s]\n" "$id" "$target"
+        fi
+        continue
+    fi
 
     if [ -f "$target" ] && [ -s "$target" ]; then
         printf "  %-40s [cached]\n" "$id"
