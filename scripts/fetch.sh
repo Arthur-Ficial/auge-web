@@ -26,8 +26,9 @@ for i in $(seq 0 $((count - 1))); do
         continue
     fi
 
-    # Resolve via Commons imageinfo API
-    api="https://commons.wikimedia.org/w/api.php?action=query&titles=File:${wiki_file// /_}&prop=imageinfo&iiprop=url&iiurlwidth=${WIDTH}&format=json"
+    # URL-encode the file title (handles spaces, umlauts, accents, parentheses)
+    encoded=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1].replace(' ','_'), safe=''))" "$wiki_file")
+    api="https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encoded}&prop=imageinfo&iiprop=url&iiurlwidth=${WIDTH}&format=json"
     resolved=$(curl -fsSL --max-time 30 -A "$USER_AGENT" "$api" 2>/dev/null \
         | jq -r '.query.pages | to_entries[0].value.imageinfo[0] | (.thumburl // .url) // empty' 2>/dev/null || true)
 

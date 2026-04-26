@@ -311,8 +311,10 @@ build_card() {
   cat <<EOF
 <article class="card" id="$id">
   <div class="card-image">
-    <img src="images/$(echo "$display_filename" | html_escape)" alt="$title_e" loading="lazy">
+    <div class="card-image-frame">
+      <img src="images/$(echo "$display_filename" | html_escape)" alt="$title_e" loading="lazy">
 $(render_face_overlay "$json_file")
+    </div>
   </div>
   <div class="card-body">
     <div class="card-meta">
