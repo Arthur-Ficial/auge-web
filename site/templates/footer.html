@@ -109,25 +109,6 @@ cd auge && make install</pre>
   </div>
 </footer>
 
-<!-- Click-to-reveal-instruction modal -->
-<div class="modal-backdrop" id="instruction-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-  <div class="modal" role="document">
-    <div class="modal-head">
-      <div class="ttl" id="modal-title">Instruction</div>
-      <button class="modal-close" aria-label="Close" onclick="closeInstructionModal()">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-eyebrow">The exact command auge ran</div>
-      <pre class="modal-instruction" id="modal-cmd"><span class="prompt">$</span><code id="modal-cmd-text"></code></pre>
-      <p class="modal-explainer">This is the literal command this card was built from. <code>auge</code> ran it on a Mac at build time, with no network calls. Copy it below and run it on your own image - the output will be exactly the same shape.</p>
-    </div>
-    <div class="modal-actions">
-      <button class="copy-cmd" id="modal-copy" onclick="copyInstructionCmd(this)">Copy command</button>
-      <button class="modal-dismiss" onclick="closeInstructionModal()">Close</button>
-    </div>
-  </div>
-</div>
-
 <script>
   // Sticky nav state
   (function() {
@@ -136,51 +117,6 @@ cd auge && make install</pre>
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   })();
-
-  // Click-to-reveal-instruction modal
-  function openInstructionModal(cmd, title) {
-    document.getElementById('modal-title').textContent = title || 'Instruction';
-    document.getElementById('modal-cmd-text').textContent = ' ' + cmd;
-    const m = document.getElementById('modal-copy');
-    m.textContent = 'Copy command';
-    m.classList.remove('copied');
-    m.dataset.cmd = cmd;
-    document.getElementById('instruction-modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeInstructionModal() {
-    document.getElementById('instruction-modal').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function copyInstructionCmd(btn) {
-    const cmd = btn.dataset.cmd || '';
-    navigator.clipboard.writeText(cmd).then(
-      () => { btn.textContent = 'Copied'; btn.classList.add('copied');
-              setTimeout(() => { btn.textContent = 'Copy command'; btn.classList.remove('copied'); }, 1600); },
-      () => { btn.textContent = 'Copy failed'; setTimeout(() => { btn.textContent = 'Copy command'; }, 1600); }
-    );
-  }
-  document.addEventListener('click', (e) => {
-    const ci = e.target.closest('.card-image');
-    if (!ci) return;
-    if (e.target.closest('a')) return; // ignore clicks on inner links
-    const cmd = ci.dataset.cmd; const title = ci.dataset.title;
-    if (cmd) openInstructionModal(cmd, title);
-  });
-  // Backdrop click closes
-  document.getElementById('instruction-modal').addEventListener('click', (e) => {
-    if (e.target.id === 'instruction-modal') closeInstructionModal();
-  });
-  // ESC closes
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeInstructionModal(); });
-  // Enter/Space on focused card-image opens
-  document.addEventListener('keydown', (e) => {
-    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement && document.activeElement.classList.contains('card-image')) {
-      e.preventDefault();
-      const ci = document.activeElement;
-      openInstructionModal(ci.dataset.cmd, ci.dataset.title);
-    }
-  });
 
   // Copy buttons (data-copy attribute, OR previous sibling pre)
   function copyCmd(btn) {
