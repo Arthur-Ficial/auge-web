@@ -89,8 +89,26 @@
     code, pre, kbd, samp { font-family: var(--font-mono); font-size: 0.92em; }
     pre { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-    @media (max-width: 640px) { .container { padding: 0 18px; } }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 24px; min-width: 0; }
+    @media (max-width: 640px) { .container { padding: 0 16px; } }
+
+    /* Mobile-first overflow safety net: any grid + grid-item + preformatted block
+       must allow itself to shrink below its natural content width on narrow viewports.
+       Without these, a long <pre>/<code>/<table> blows the parent past 100vw. */
+    .why-grid, .what-grid, .how-grid, .supports-grid, .install-row,
+    .family-grid, .corpus-summary, .cards, .footer-inner { min-width: 0; }
+    .why-card, .what-card, .how-card, .supports-card, .install-card,
+    .family-card, .corpus-stat, .card, .section-block { min-width: 0; }
+    .what-card pre, .install-card pre, .cmd-line, .json-block,
+    .ocr-text, .barcode-row, .term, .term-body, .modal-instruction,
+    .hero-demo, .arch-flow, .arch-box {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .what-card pre, .install-card pre, .term-body, .arch-flow {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
     /* ============== NAV ============== */
     .nav {
@@ -150,8 +168,9 @@
       display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, #6366F1 0%, #4F46E5 40%, #4338CA 70%, #312E81 100%);
       overflow: hidden;
-      padding: 120px 24px 80px;
+      padding: 100px 18px 64px;
     }
+    @media (min-width: 720px) { .hero { padding: 120px 24px 80px; } }
     .hero::before {
       content: '';
       position: absolute; inset: 0;
@@ -181,7 +200,10 @@
 
     .hero-content {
       position: relative; z-index: 2;
-      text-align: center; max-width: 820px;
+      text-align: center;
+      width: 100%;
+      max-width: 820px;
+      min-width: 0;
     }
     .hero-content > * { opacity: 0; transform: translate3d(0,30px,0); animation: hero-in 0.8s var(--ease-out-expo) forwards; }
     .hero-content > *:nth-child(1) { animation-delay: 0.10s; }
@@ -216,12 +238,13 @@
     .hero-title {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: clamp(72px, 16vw, 200px);
-      line-height: 0.88;
+      font-size: clamp(56px, 18vw, 200px);
+      line-height: 0.9;
       color: white;
       letter-spacing: -0.04em;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
       text-shadow: 0 4px 30px rgba(0,0,0,0.18);
+      word-break: break-word;
     }
     .hero-subtitle {
       font-size: clamp(20px, 3vw, 30px);
@@ -257,21 +280,32 @@
     .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
 
     .hero-install {
-      display: inline-flex; align-items: center; gap: 12px;
-      padding: 14px 18px;
+      display: flex; align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px 14px;
       background: rgba(11,11,20,0.65);
       border: 1px solid rgba(255,255,255,0.18);
       border-radius: 12px;
       backdrop-filter: blur(8px);
       max-width: 100%;
-      overflow: hidden;
+      min-width: 0;
+      box-sizing: border-box;
+      margin: 0 auto;
     }
     .hero-install code {
+      flex: 1 1 200px;
+      min-width: 0;
       font-family: var(--font-mono);
       color: white;
-      font-size: 15px;
+      font-size: 14px;
       white-space: nowrap;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (min-width: 720px) {
+      .hero-install code { font-size: 15px; }
+      .hero-install { padding: 14px 18px; gap: 12px; }
     }
     .hero-install .prompt { color: var(--indigo-400); margin-right: 8px; user-select: none; }
     .copy-btn {
