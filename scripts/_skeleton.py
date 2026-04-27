@@ -118,10 +118,50 @@ def main():
     if not instances:
         return
 
+    # Use the same NEON palette as _pose_render.py so big-image overlays and
+    # per-instance section thumbs are visually consistent.
+    BODY_COLOR = {
+        "head_joint": "#ff00aa",
+        "left_ear_joint": "#ff7f00", "right_ear_joint": "#ff7f00",
+        "left_eye_joint": "#00e0ff", "right_eye_joint": "#00ffff",
+        "neck_1_joint": "#bf00ff", "root": "#9d00ff",
+        "left_shoulder_1_joint": "#00ff66", "left_forearm_joint": "#00ff66", "left_hand_joint": "#00ff66",
+        "right_shoulder_1_joint": "#39ff14", "right_forearm_joint": "#39ff14", "right_hand_joint": "#39ff14",
+        "left_upLeg_joint": "#ff1744", "left_leg_joint": "#ff1744", "left_foot_joint": "#ff1744",
+        "right_upLeg_joint": "#ff4081", "right_leg_joint": "#ff4081", "right_foot_joint": "#ff4081",
+    }
+    HAND_COLOR = {
+        "VNHLKWRI": "#ffffff",
+        "VNHLKTCMC": "#ff1744", "VNHLKTMP": "#ff1744", "VNHLKTIP": "#ff1744", "VNHLKTTIP": "#ff1744",
+        "VNHLKIMCP": "#ff7f00", "VNHLKIPIP": "#ff7f00", "VNHLKIDIP": "#ff7f00", "VNHLKITIP": "#ff7f00",
+        "VNHLKMMCP": "#39ff14", "VNHLKMPIP": "#39ff14", "VNHLKMDIP": "#39ff14", "VNHLKMTIP": "#39ff14",
+        "VNHLKRMCP": "#00e0ff", "VNHLKRPIP": "#00e0ff", "VNHLKRDIP": "#00e0ff", "VNHLKRTIP": "#00e0ff",
+        "VNHLKPMCP": "#ff00aa", "VNHLKPPIP": "#ff00aa", "VNHLKPDIP": "#ff00aa", "VNHLKPTIP": "#ff00aa",
+    }
+    ANIMAL_COLOR = {
+        "animal_joint_left_eye": "#00e0ff", "animal_joint_right_eye": "#00ffff",
+        "animal_joint_nose": "#ff00aa",
+        "animal_joint_left_ear_top": "#ff7f00", "animal_joint_left_ear_middle": "#ff7f00", "animal_joint_left_ear_bottom": "#ff7f00",
+        "animal_joint_right_ear_top": "#ff7f00", "animal_joint_right_ear_middle": "#ff7f00", "animal_joint_right_ear_bottom": "#ff7f00",
+        "animal_joint_neck": "#bf00ff", "animal_joint_heck": "#bf00ff",
+        "animal_joint_left_front_elbow": "#00ff66", "animal_joint_left_front_knee": "#00ff66", "animal_joint_left_front_paw": "#00ff66",
+        "animal_joint_right_front_elbow": "#39ff14", "animal_joint_right_front_knee": "#39ff14", "animal_joint_right_front_paw": "#39ff14",
+        "animal_joint_left_back_elbow": "#ff1744", "animal_joint_left_back_knee": "#ff1744", "animal_joint_left_back_paw": "#ff1744",
+        "animal_joint_right_back_elbow": "#ff4081", "animal_joint_right_back_knee": "#ff4081", "animal_joint_right_back_paw": "#ff4081",
+        "animal_joint_tail_top": "#fff200", "animal_joint_tail_middle": "#fff200", "animal_joint_tail_bottom": "#fff200",
+    }
+    COLOR_TABLE = {"body": BODY_COLOR, "hand": HAND_COLOR, "animal": ANIMAL_COLOR}[kind]
+    BIG_JOINTS = {
+        "head_joint", "animal_joint_nose",
+        "VNHLKWRI", "VNHLKTTIP", "VNHLKITIP", "VNHLKMTIP", "VNHLKRTIP", "VNHLKPTIP",
+    }
+    DEFAULT = "#ffffff"
+
     parts = [f'<svg class="{cls}" viewBox="0 0 1 1" preserveAspectRatio="none">']
     any_drawn = False
     for inst in instances:
         joints = {j["name"]: j for j in inst.get("joints", [])}
+        # Bones — fat white halo + neon coloured core, matching section thumbs.
         for a, b in edges:
             ja, jb = joints.get(a), joints.get(b)
             if not ja or not jb:
@@ -130,13 +170,31 @@ def main():
                 continue
             ax, ay = ja["x"], 1.0 - ja["y"]
             bx, by = jb["x"], 1.0 - jb["y"]
-            parts.append(f'<line x1="{ax:.4f}" y1="{ay:.4f}" x2="{bx:.4f}" y2="{by:.4f}"/>')
+            limb_color = COLOR_TABLE.get(b, COLOR_TABLE.get(a, DEFAULT))
+            parts.append(
+                f'<line x1="{ax:.4f}" y1="{ay:.4f}" x2="{bx:.4f}" y2="{by:.4f}" '
+                f'stroke="white" stroke-width="0.012" stroke-linecap="round" opacity="0.95"/>'
+            )
+            parts.append(
+                f'<line x1="{ax:.4f}" y1="{ay:.4f}" x2="{bx:.4f}" y2="{by:.4f}" '
+                f'stroke="{limb_color}" stroke-width="0.0065" stroke-linecap="round"/>'
+            )
             any_drawn = True
+        # Joints — neon dot with white halo. Head / nose / wrist / fingertips
+        # rendered nearly twice as large.
         for j in inst.get("joints", []):
             if j.get("confidence", 0) < CONF_THRESHOLD:
                 continue
             cx, cy = j["x"], 1.0 - j["y"]
-            parts.append(f'<circle cx="{cx:.4f}" cy="{cy:.4f}" r="0.006"/>')
+            color = COLOR_TABLE.get(j["name"], DEFAULT)
+            r = 0.013 if j["name"] in BIG_JOINTS else 0.0085
+            parts.append(
+                f'<circle cx="{cx:.4f}" cy="{cy:.4f}" r="{r * 1.35:.4f}" '
+                f'fill="white" opacity="0.85"/>'
+            )
+            parts.append(
+                f'<circle cx="{cx:.4f}" cy="{cy:.4f}" r="{r:.4f}" fill="{color}"/>'
+            )
             any_drawn = True
 
     if not any_drawn:

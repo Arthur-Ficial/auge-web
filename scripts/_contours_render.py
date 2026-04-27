@@ -94,12 +94,22 @@ for ii, p in enumerate(paths, start=1):
         f'<span class="lm-swatch" style="background:{color}"></span></span></div>'
     )
 
-    coord_chips = " ".join(
+    # First 20 points always visible; the remainder folds into a <details>.
+    HEAD = 20
+    head_chips = " ".join(
         f'<span class="lm-pt">{k+1}: ({pt["x"]:.3f}, {pt["y"]:.3f})</span>'
-        for k, pt in enumerate(pts)
+        for k, pt in enumerate(pts[:HEAD])
     )
-    print(
-        f'      <div class="lm-region">'
-        f'<span class="lm-coords">{coord_chips}</span>'
-        f'</div>'
+    tail_chips = " ".join(
+        f'<span class="lm-pt">{k+1+HEAD}: ({pt["x"]:.3f}, {pt["y"]:.3f})</span>'
+        for k, pt in enumerate(pts[HEAD:])
     )
+    body = f'<span class="lm-coords">{head_chips}</span>'
+    if tail_chips:
+        remaining = len(pts) - HEAD
+        body += (
+            f'<details class="lm-more"><summary>show all {remaining} more '
+            f'point{"s" if remaining != 1 else ""}</summary>'
+            f'<span class="lm-coords">{tail_chips}</span></details>'
+        )
+    print(f'      <div class="lm-region">{body}</div>')

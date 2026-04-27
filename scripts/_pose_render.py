@@ -103,75 +103,86 @@ ANIMAL_EDGES = [
     ("animal_joint_tail_middle", "animal_joint_tail_bottom"),
 ]
 
-# Per-joint-group color codes. Reused for the swatch in the coord listing.
+# Per-joint-group NEON colours. Bright, saturated, visible on any background.
+# The head joint gets a flashing-magenta-style hue and is drawn larger so it's
+# unmissable.
 BODY_GROUPS = {
-    "head_joint": ("#f97316", "head"),
-    "left_ear_joint": ("#fb923c", "head"),
-    "right_ear_joint": ("#fb923c", "head"),
-    "left_eye_joint": ("#3b82f6", "eyes"),
-    "right_eye_joint": ("#06b6d4", "eyes"),
-    "neck_1_joint": ("#a855f7", "torso"),
-    "root": ("#7c3aed", "torso"),
-    "left_shoulder_1_joint": ("#10b981", "left arm"),
-    "left_forearm_joint":    ("#10b981", "left arm"),
-    "left_hand_joint":       ("#10b981", "left arm"),
-    "right_shoulder_1_joint":("#22c55e", "right arm"),
-    "right_forearm_joint":   ("#22c55e", "right arm"),
-    "right_hand_joint":      ("#22c55e", "right arm"),
-    "left_upLeg_joint":      ("#dc2626", "left leg"),
-    "left_leg_joint":        ("#dc2626", "left leg"),
-    "left_foot_joint":       ("#dc2626", "left leg"),
-    "right_upLeg_joint":     ("#f43f5e", "right leg"),
-    "right_leg_joint":       ("#f43f5e", "right leg"),
-    "right_foot_joint":      ("#f43f5e", "right leg"),
+    "head_joint":             ("#ff00aa", "head"),   # neon magenta — biggest dot
+    "left_ear_joint":         ("#ff7f00", "head"),   # neon orange
+    "right_ear_joint":        ("#ff7f00", "head"),
+    "left_eye_joint":         ("#00e0ff", "eyes"),   # neon cyan
+    "right_eye_joint":        ("#00ffff", "eyes"),   # bright cyan
+    "neck_1_joint":           ("#bf00ff", "torso"),  # neon violet
+    "root":                   ("#9d00ff", "torso"),
+    "left_shoulder_1_joint":  ("#00ff66", "left arm"),  # neon green
+    "left_forearm_joint":     ("#00ff66", "left arm"),
+    "left_hand_joint":        ("#00ff66", "left arm"),
+    "right_shoulder_1_joint": ("#39ff14", "right arm"), # electric green
+    "right_forearm_joint":    ("#39ff14", "right arm"),
+    "right_hand_joint":       ("#39ff14", "right arm"),
+    "left_upLeg_joint":       ("#ff1744", "left leg"),  # neon red
+    "left_leg_joint":         ("#ff1744", "left leg"),
+    "left_foot_joint":        ("#ff1744", "left leg"),
+    "right_upLeg_joint":      ("#ff4081", "right leg"), # hot pink
+    "right_leg_joint":        ("#ff4081", "right leg"),
+    "right_foot_joint":       ("#ff4081", "right leg"),
 }
 
 HAND_GROUPS = {
-    "VNHLKWRI": ("#94a3b8", "wrist"),
-    # thumb
-    "VNHLKTCMC": ("#dc2626", "thumb"), "VNHLKTMP": ("#dc2626", "thumb"),
-    "VNHLKTIP":  ("#dc2626", "thumb"), "VNHLKTTIP":("#dc2626", "thumb"),
-    # index
-    "VNHLKIMCP": ("#f97316", "index"), "VNHLKIPIP": ("#f97316", "index"),
-    "VNHLKIDIP": ("#f97316", "index"), "VNHLKITIP": ("#f97316", "index"),
-    # middle
-    "VNHLKMMCP": ("#10b981", "middle"), "VNHLKMPIP": ("#10b981", "middle"),
-    "VNHLKMDIP": ("#10b981", "middle"), "VNHLKMTIP": ("#10b981", "middle"),
-    # ring
-    "VNHLKRMCP": ("#3b82f6", "ring"),  "VNHLKRPIP": ("#3b82f6", "ring"),
-    "VNHLKRDIP": ("#3b82f6", "ring"),  "VNHLKRTIP": ("#3b82f6", "ring"),
-    # pinky
-    "VNHLKPMCP": ("#a855f7", "pinky"), "VNHLKPPIP": ("#a855f7", "pinky"),
-    "VNHLKPDIP": ("#a855f7", "pinky"), "VNHLKPTIP": ("#a855f7", "pinky"),
+    "VNHLKWRI": ("#ffffff", "wrist"),
+    # thumb — neon red
+    "VNHLKTCMC": ("#ff1744", "thumb"), "VNHLKTMP":  ("#ff1744", "thumb"),
+    "VNHLKTIP":  ("#ff1744", "thumb"), "VNHLKTTIP": ("#ff1744", "thumb"),
+    # index — neon orange
+    "VNHLKIMCP": ("#ff7f00", "index"), "VNHLKIPIP": ("#ff7f00", "index"),
+    "VNHLKIDIP": ("#ff7f00", "index"), "VNHLKITIP": ("#ff7f00", "index"),
+    # middle — neon green
+    "VNHLKMMCP": ("#39ff14", "middle"), "VNHLKMPIP": ("#39ff14", "middle"),
+    "VNHLKMDIP": ("#39ff14", "middle"), "VNHLKMTIP": ("#39ff14", "middle"),
+    # ring — neon cyan
+    "VNHLKRMCP": ("#00e0ff", "ring"), "VNHLKRPIP": ("#00e0ff", "ring"),
+    "VNHLKRDIP": ("#00e0ff", "ring"), "VNHLKRTIP": ("#00e0ff", "ring"),
+    # pinky — neon magenta
+    "VNHLKPMCP": ("#ff00aa", "pinky"), "VNHLKPPIP": ("#ff00aa", "pinky"),
+    "VNHLKPDIP": ("#ff00aa", "pinky"), "VNHLKPTIP": ("#ff00aa", "pinky"),
 }
 
 ANIMAL_GROUPS = {
-    "animal_joint_left_eye":  ("#3b82f6", "head"),
-    "animal_joint_right_eye": ("#06b6d4", "head"),
-    "animal_joint_nose":      ("#f97316", "head"),
-    "animal_joint_left_ear_top":    ("#fb923c", "head"),
-    "animal_joint_left_ear_middle": ("#fb923c", "head"),
-    "animal_joint_left_ear_bottom": ("#fb923c", "head"),
-    "animal_joint_right_ear_top":    ("#fb923c", "head"),
-    "animal_joint_right_ear_middle": ("#fb923c", "head"),
-    "animal_joint_right_ear_bottom": ("#fb923c", "head"),
-    "animal_joint_neck":      ("#a855f7", "neck/back"),
-    "animal_joint_heck":      ("#a855f7", "neck/back"),
-    "animal_joint_left_front_elbow":  ("#10b981", "left front"),
-    "animal_joint_left_front_knee":   ("#10b981", "left front"),
-    "animal_joint_left_front_paw":    ("#10b981", "left front"),
-    "animal_joint_right_front_elbow": ("#22c55e", "right front"),
-    "animal_joint_right_front_knee":  ("#22c55e", "right front"),
-    "animal_joint_right_front_paw":   ("#22c55e", "right front"),
-    "animal_joint_left_back_elbow":   ("#dc2626", "left back"),
-    "animal_joint_left_back_knee":    ("#dc2626", "left back"),
-    "animal_joint_left_back_paw":     ("#dc2626", "left back"),
-    "animal_joint_right_back_elbow":  ("#f43f5e", "right back"),
-    "animal_joint_right_back_knee":   ("#f43f5e", "right back"),
-    "animal_joint_right_back_paw":    ("#f43f5e", "right back"),
-    "animal_joint_tail_top":    ("#facc15", "tail"),
-    "animal_joint_tail_middle": ("#facc15", "tail"),
-    "animal_joint_tail_bottom": ("#facc15", "tail"),
+    "animal_joint_left_eye":          ("#00e0ff", "head"),
+    "animal_joint_right_eye":         ("#00ffff", "head"),
+    "animal_joint_nose":              ("#ff00aa", "head"),
+    "animal_joint_left_ear_top":      ("#ff7f00", "head"),
+    "animal_joint_left_ear_middle":   ("#ff7f00", "head"),
+    "animal_joint_left_ear_bottom":   ("#ff7f00", "head"),
+    "animal_joint_right_ear_top":     ("#ff7f00", "head"),
+    "animal_joint_right_ear_middle":  ("#ff7f00", "head"),
+    "animal_joint_right_ear_bottom":  ("#ff7f00", "head"),
+    "animal_joint_neck":              ("#bf00ff", "neck/back"),
+    "animal_joint_heck":              ("#bf00ff", "neck/back"),
+    "animal_joint_left_front_elbow":  ("#00ff66", "left front"),
+    "animal_joint_left_front_knee":   ("#00ff66", "left front"),
+    "animal_joint_left_front_paw":    ("#00ff66", "left front"),
+    "animal_joint_right_front_elbow": ("#39ff14", "right front"),
+    "animal_joint_right_front_knee":  ("#39ff14", "right front"),
+    "animal_joint_right_front_paw":   ("#39ff14", "right front"),
+    "animal_joint_left_back_elbow":   ("#ff1744", "left back"),
+    "animal_joint_left_back_knee":    ("#ff1744", "left back"),
+    "animal_joint_left_back_paw":     ("#ff1744", "left back"),
+    "animal_joint_right_back_elbow":  ("#ff4081", "right back"),
+    "animal_joint_right_back_knee":   ("#ff4081", "right back"),
+    "animal_joint_right_back_paw":    ("#ff4081", "right back"),
+    "animal_joint_tail_top":          ("#fff200", "tail"),
+    "animal_joint_tail_middle":       ("#fff200", "tail"),
+    "animal_joint_tail_bottom":       ("#fff200", "tail"),
+}
+
+# Joints rendered noticeably larger so they pop out — head + nose primarily.
+LARGE_JOINTS = {
+    "head_joint",
+    "animal_joint_nose",
+    # hand wrist + finger tips deserve emphasis too.
+    "VNHLKWRI",
+    "VNHLKTTIP", "VNHLKITIP", "VNHLKMTIP", "VNHLKRTIP", "VNHLKPTIP",
 }
 
 CONFIG = {
@@ -232,8 +243,13 @@ for ii, inst in enumerate(instances, start=1):
     px_w = max(1.0, bw * w_img)
     px_h = max(1.0, bh * h_img)
 
-    radius = max(1.5, min(px_w, px_h) * 0.014)
-    stroke = max(0.8, radius * 0.45)
+    # Sized so the dots and bones are visibly chunky on small thumbs and the
+    # giant overlay alike. Tied to the smaller of the two pixel dimensions.
+    base = min(px_w, px_h)
+    radius = max(3.0, base * 0.022)        # joint dot
+    big_radius = radius * 1.65              # head / nose / wrist / fingertips
+    bone_outline = max(2.0, base * 0.012)   # white halo around bones
+    bone_core    = max(1.2, base * 0.0065)  # neon coloured inner stroke
 
     svg = [
         f'<svg class="bbox-thumb pose-thumb" '
@@ -244,7 +260,8 @@ for ii, inst in enumerate(instances, start=1):
     ]
 
     by_name = {j["name"]: j for j in joints}
-    # bones first (under the dots).
+    # Bones first — drawn as a fat white halo + a neon coloured inner stroke
+    # tinted by the limb's joint group. Visible on dark and light images alike.
     for a, b in edges:
         ja, jb = by_name.get(a), by_name.get(b)
         if not ja or not jb:
@@ -253,23 +270,40 @@ for ii, inst in enumerate(instances, start=1):
             continue
         ax, ay = vis_to_px(ja["x"], ja["y"])
         bx2, by2 = vis_to_px(jb["x"], jb["y"])
-        svg.append(
-            f'<line x1="{ax:.2f}" y1="{ay:.2f}" x2="{bx2:.2f}" y2="{by2:.2f}" '
-            f'stroke="white" stroke-width="{stroke*1.5:.2f}" stroke-linecap="round"/>'
+        # Limb colour: pick the joint that's NOT a generic wrist/root/neck.
+        limb_color = (
+            groups.get(b, (DEFAULT_COLOR, ""))[0]
+            if groups.get(b, (DEFAULT_COLOR, ""))[1] not in ("wrist", "torso")
+            else groups.get(a, (DEFAULT_COLOR, ""))[0]
         )
         svg.append(
             f'<line x1="{ax:.2f}" y1="{ay:.2f}" x2="{bx2:.2f}" y2="{by2:.2f}" '
-            f'stroke="#1f2937" stroke-width="{stroke*0.8:.2f}" stroke-linecap="round"/>'
+            f'stroke="white" stroke-width="{bone_outline:.2f}" '
+            f'stroke-linecap="round" opacity="0.95"/>'
+        )
+        svg.append(
+            f'<line x1="{ax:.2f}" y1="{ay:.2f}" x2="{bx2:.2f}" y2="{by2:.2f}" '
+            f'stroke="{limb_color}" stroke-width="{bone_core:.2f}" '
+            f'stroke-linecap="round"/>'
         )
 
-    # joints on top.
+    # Joints on top. Head / nose / wrist / fingertips are drawn LARGER so the
+    # focal anatomy reads at any thumbnail size.
     for j in joints:
         color, _ = groups.get(j["name"], (DEFAULT_COLOR, "?"))
         cx, cy = vis_to_px(j["x"], j["y"])
+        is_big = j["name"] in LARGE_JOINTS
+        r = big_radius if is_big else radius
         opacity = "1.0" if j.get("confidence", 0) >= CONF_THRESHOLD else "0.35"
+        # Outer white halo for contrast on any background, then the coloured dot.
         svg.append(
-            f'<circle cx="{cx:.2f}" cy="{cy:.2f}" r="{radius:.2f}" '
-            f'fill="{color}" stroke="white" stroke-width="{stroke:.2f}" opacity="{opacity}"/>'
+            f'<circle cx="{cx:.2f}" cy="{cy:.2f}" r="{r * 1.35:.2f}" '
+            f'fill="white" opacity="{0.85 if is_big else 0.7}"/>'
+        )
+        svg.append(
+            f'<circle cx="{cx:.2f}" cy="{cy:.2f}" r="{r:.2f}" '
+            f'fill="{color}" stroke="white" stroke-width="{max(1.0, r * 0.25):.2f}" '
+            f'opacity="{opacity}"/>'
         )
 
     svg.append("</svg>")

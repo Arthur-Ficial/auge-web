@@ -919,6 +919,71 @@
       font-size: 11px;
       margin-right: 4px;
     }
+    /* Folded "show more" reveal for long coordinate lists (e.g. contours
+       with hundreds of points). The first ~20 chips stay visible; the rest
+       hide behind a click. Truthful — every coord is still shipped, just
+       not all rendered at once. */
+    .lm-more {
+      margin-top: 6px;
+      padding-left: 18px;
+    }
+    .lm-more > summary {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--indigo-700);
+      padding: 4px 8px;
+      display: inline-block;
+      border-radius: 4px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      list-style: none;
+      user-select: none;
+    }
+    .lm-more > summary::before {
+      content: "▸ ";
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+    .lm-more[open] > summary::before { content: "▾ "; }
+    .lm-more > summary:hover { background: var(--gray-100); }
+    .lm-more .lm-coords {
+      display: block;
+      margin-top: 8px;
+    }
+
+    /* Hero showcase image — a fully-rendered card screenshot at the top of
+       the page so visitors see the result before reading any prose. */
+    .hero-showcase {
+      margin: 36px auto 0;
+      max-width: 720px;
+      padding: 0 16px;
+    }
+    .hero-showcase-frame {
+      border-radius: 14px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 30px 80px -20px rgba(15, 23, 42, 0.45),
+                  0 12px 32px -8px rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.18);
+    }
+    .hero-showcase-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .hero-showcase-cap {
+      margin-top: 10px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+    }
+    .hero-showcase-cap a {
+      color: white;
+      text-decoration: underline;
+      text-decoration-color: rgba(255,255,255,0.4);
+    }
 
     /* Saliency / animals overlays (boxes on image). */
     .saliency-overlay { position: absolute; inset: 0; pointer-events: none; }
@@ -1454,6 +1519,12 @@
     </div>
     <p class="hero-repo">Source: <a href="https://github.com/Arthur-Ficial/auge" target="_blank" rel="noopener">github.com/Arthur-Ficial/auge</a></p>
     <p class="hero-req">Requires: macOS 26 (Tahoe) &middot; Apple Silicon &middot; No Xcode needed</p>
+    <div class="hero-showcase">
+      <div class="hero-showcase-frame">
+        <img src="images/hero-transistor.jpg" alt="auge --all on the 1948 Bell Labs transistor inventors photo: face bboxes, body and hand pose skeletons, landmarks, saliency, contours all drawn over a single image" loading="eager">
+      </div>
+      <p class="hero-showcase-cap">one command on a 1948 photo of the transistor inventors at Bell Labs &mdash; <a href="#bell-labs-transistor">see the full breakdown &darr;</a></p>
+    </div>
   </div>
 </section>
 
