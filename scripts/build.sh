@@ -272,7 +272,7 @@ EOF
     local x y w h thumb
     x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
     w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
-    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$x" "$y" "$w" "$h")
     printf '    <div class="bbox-row">%s<span>face %s: x=%.3f y=%.3f w=%.3f h=%.3f</span></div>\n' "$thumb" "$i" "$x" "$y" "$w" "$h"
   done
 
@@ -385,7 +385,7 @@ EOF
     cconf=$(echo "$row" | jq -r '.confidence')
     cx=$(echo "$row"    | jq -r '.x'); cy=$(echo "$row" | jq -r '.y')
     cw=$(echo "$row"    | jq -r '.width'); ch=$(echo "$row" | jq -r '.height')
-    thumb=$(bbox_thumb "$image_file" "$cx" "$cy" "$cw" "$ch")
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$cx" "$cy" "$cw" "$ch")
     printf '    <div class="bbox-row">%s<span>region %s — <strong>%.1f%%</strong> confidence — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
       "$thumb" "$idx" "$(awk "BEGIN{print $cconf*100}")" "$cx" "$cy" "$cw" "$ch"
   done
@@ -440,7 +440,7 @@ EOF
     local bw bh
     bw=$(awk "BEGIN{print $maxx - $minx}")
     bh=$(awk "BEGIN{print $maxy - $miny}")
-    thumb=$(bbox_thumb "$image_file" "$minx" "$miny" "$bw" "$bh")
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
     printf '    <div class="bbox-row">%s<span>rect %s — <strong>%.1f%%</strong> confidence — corners tl(%.3f,%.3f) tr(%.3f,%.3f) bl(%.3f,%.3f) br(%.3f,%.3f)</span></div>\n' \
       "$thumb" "$idx" "$(awk "BEGIN{print $conf*100}")" "$tlx" "$tly" "$trx" "$try" "$blx" "$bly" "$brx" "$bry"
   done
@@ -530,7 +530,7 @@ EOF
     roll=$(echo "$face"  | jq -r '.roll  // empty')
     yaw=$(echo "$face"   | jq -r '.yaw   // empty')
     pitch=$(echo "$face" | jq -r '.pitch // empty')
-    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$x" "$y" "$w" "$h")
 
     local pose_html
     if [ -n "$roll" ] && [ "$roll" != "null" ] && [ -n "$yaw" ] && [ -n "$pitch" ]; then
@@ -591,7 +591,7 @@ EOF
     conf=$(echo "$row" | jq -r '.confidence')
     x=$(echo "$row"  | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
     w=$(echo "$row"  | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
-    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$x" "$y" "$w" "$h")
     printf '    <div class="bbox-row">%s<span>%s. <strong>%s</strong> — %.1f%% confidence — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
       "$thumb" "$idx" "$(echo "$lab" | html_escape)" "$(awk "BEGIN{print $conf*100}")" "$x" "$y" "$w" "$h"
   done
@@ -605,6 +605,7 @@ EOF
 
 render_body_pose_section() {
   local id="$1"
+  local image_file="$2"
   local f="$DATA/$id.body-pose.json"
   if [ ! -f "$f" ]; then
     cat <<EOF
@@ -633,11 +634,22 @@ EOF
   <div class="data-list">
 EOF
   jq -c '.results.bodies[]' "$f" | nl -w1 -ba | while read -r idx body; do
-    local jcount avg
+    local jcount avg minx miny maxx maxy bw bh thumb
     jcount=$(echo "$body" | jq -r '.joints | length')
     avg=$(echo "$body" | jq -r '[.joints[].confidence] | add / length')
-    printf '    <div>body %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong></div>\n' \
-      "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")"
+    # Bounding box of all detected joints (Vision-style, bottom-origin).
+    read -r minx maxx miny maxy <<< "$(echo "$body" | jq -r '
+      [.joints[] | select(.confidence > 0.05)] as $J |
+      "\($J | min_by(.x).x) \($J | max_by(.x).x) \($J | min_by(.y).y) \($J | max_by(.y).y)"')"
+    if [ -n "$minx" ] && [ "$minx" != "null" ]; then
+      bw=$(awk "BEGIN{print $maxx - $minx}")
+      bh=$(awk "BEGIN{print $maxy - $miny}")
+      thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
+    else
+      thumb=""
+    fi
+    printf '    <div class="bbox-row">%s<span>body %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong> — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
   done
   cat <<EOF
   </div>
@@ -647,6 +659,7 @@ EOF
 
 render_hand_pose_section() {
   local id="$1"
+  local image_file="$2"
   local f="$DATA/$id.hand-pose.json"
   if [ ! -f "$f" ]; then
     cat <<EOF
@@ -675,12 +688,22 @@ EOF
   <div class="data-list">
 EOF
   jq -c '.results.hands[]' "$f" | nl -w1 -ba | while read -r idx hand; do
-    local chirality jcount avg
+    local chirality jcount avg minx maxx miny maxy bw bh thumb
     chirality=$(echo "$hand" | jq -r '.chirality')
     jcount=$(echo "$hand"    | jq -r '.joints | length')
     avg=$(echo "$hand"       | jq -r '[.joints[].confidence] | add / length')
-    printf '    <div>hand %s — <strong>%s</strong> — %s joints — avg confidence <strong>%.1f%%</strong></div>\n' \
-      "$idx" "$chirality" "$jcount" "$(awk "BEGIN{print $avg*100}")"
+    read -r minx maxx miny maxy <<< "$(echo "$hand" | jq -r '
+      [.joints[] | select(.confidence > 0.05)] as $J |
+      "\($J | min_by(.x).x) \($J | max_by(.x).x) \($J | min_by(.y).y) \($J | max_by(.y).y)"')"
+    if [ -n "$minx" ] && [ "$minx" != "null" ]; then
+      bw=$(awk "BEGIN{print $maxx - $minx}")
+      bh=$(awk "BEGIN{print $maxy - $miny}")
+      thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
+    else
+      thumb=""
+    fi
+    printf '    <div class="bbox-row">%s<span>hand %s — <strong>%s</strong> — %s joints — avg confidence <strong>%.1f%%</strong> — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$chirality" "$jcount" "$(awk "BEGIN{print $avg*100}")" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
   done
   cat <<EOF
   </div>
@@ -690,6 +713,7 @@ EOF
 
 render_animal_pose_section() {
   local id="$1"
+  local image_file="$2"
   local f="$DATA/$id.animal-pose.json"
   if [ ! -f "$f" ]; then
     cat <<EOF
@@ -718,11 +742,21 @@ EOF
   <div class="data-list">
 EOF
   jq -c '.results.animals[]' "$f" | nl -w1 -ba | while read -r idx an; do
-    local jcount avg
+    local jcount avg minx maxx miny maxy bw bh thumb
     jcount=$(echo "$an" | jq -r '.joints | length')
     avg=$(echo "$an"    | jq -r '[.joints[].confidence] | add / length')
-    printf '    <div>animal %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong></div>\n' \
-      "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")"
+    read -r minx maxx miny maxy <<< "$(echo "$an" | jq -r '
+      [.joints[] | select(.confidence > 0.05)] as $J |
+      "\($J | min_by(.x).x) \($J | max_by(.x).x) \($J | min_by(.y).y) \($J | max_by(.y).y)"')"
+    if [ -n "$minx" ] && [ "$minx" != "null" ]; then
+      bw=$(awk "BEGIN{print $maxx - $minx}")
+      bh=$(awk "BEGIN{print $maxy - $miny}")
+      thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
+    else
+      thumb=""
+    fi
+    printf '    <div class="bbox-row">%s<span>animal %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong> — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
   done
   cat <<EOF
   </div>
@@ -732,6 +766,7 @@ EOF
 
 render_contours_section() {
   local id="$1"
+  local image_file="$2"
   local f="$DATA/$id.contours.json"
   if [ ! -f "$f" ]; then
     cat <<EOF
@@ -754,9 +789,20 @@ EOF
 EOF
   if [ "$sample" -gt 0 ]; then
     jq -c '.results.contours.paths[]' "$f" | nl -w1 -ba | while read -r idx p; do
-      local pc
+      local pc minx maxx miny maxy bw bh thumb
       pc=$(echo "$p" | jq -r '.pointCount')
-      printf '    <div>path %s — <strong>%s</strong> points</div>\n' "$idx" "$pc"
+      read -r minx maxx miny maxy <<< "$(echo "$p" | jq -r '
+        [.points[]] as $P |
+        "\($P | min_by(.x).x) \($P | max_by(.x).x) \($P | min_by(.y).y) \($P | max_by(.y).y)"')"
+      if [ -n "$minx" ] && [ "$minx" != "null" ]; then
+        bw=$(awk "BEGIN{print $maxx - $minx}")
+        bh=$(awk "BEGIN{print $maxy - $miny}")
+        thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
+      else
+        thumb=""
+      fi
+      printf '    <div class="bbox-row">%s<span>path %s — <strong>%s</strong> points — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+        "$thumb" "$idx" "$pc" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
     done
   else
     echo '    <div class="empty-msg">No top-level contours.</div>'
@@ -802,7 +848,7 @@ EOF
     conf=$(echo "$row" | jq -r '.confidence')
     x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
     w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
-    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$x" "$y" "$w" "$h")
     printf '    <div class="bbox-row">%s<span>region %s — <strong>%.1f%%</strong> confidence — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
       "$thumb" "$idx" "$(awk "BEGIN{print $conf*100}")" "$x" "$y" "$w" "$h"
   done
@@ -1084,10 +1130,10 @@ render_animal_pose_overlay() {
   python3 "$ROOT/scripts/_skeleton.py" "$DATA/$1.animal-pose.json" animal "skel-overlay animal" 2>/dev/null
 }
 
-# Emit a tiny SVG thumbnail of the image cropped to a bbox. Used inside lists
-# next to numeric coordinates. Args: $1 image_basename, $2 x, $3 y, $4 w, $5 h
+# Emit an aspect-ratio-correct SVG thumbnail of the image cropped to a bbox.
+# Args: $1 image_basename, $2 image_w_px, $3 image_h_px, $4 x, $5 y, $6 w, $7 h
 bbox_thumb() {
-  python3 "$ROOT/scripts/_bbox_thumb.py" "images/$1" "$2" "$3" "$4" "$5" 2>/dev/null
+  python3 "$ROOT/scripts/_bbox_thumb.py" "images/$1" "$2" "$3" "$4" "$5" "$6" "$7" 2>/dev/null
 }
 
 render_contours_overlay() {
@@ -1135,6 +1181,34 @@ render_text_rectangles_overlay() {
 # vector is truncated to 8 elements to keep the page under 1MB.
 render_combined_json() {
   python3 "$ROOT/scripts/_combine_json.py" "$DATA" "$1"
+}
+
+# Per-card JSON file links. Lists every capability JSON for the item.
+# Each link points to a file under site/data/ that contains the full,
+# un-truncated auge output for that capability.
+json_link_list() {
+  local id="$1"
+  local f label size
+  for f in "$DATA/$id".*.json "$DATA/$id.json"; do
+    [ -f "$f" ] || continue
+    label=$(basename "$f")
+    # capability portion: between $id. and .json (or "all" if just $id.json)
+    case "$label" in
+      "$id.json")          cap="all" ;;
+      "$id".*.json)
+        cap="${label#$id.}"
+        cap="${cap%.json}"
+        ;;
+      *)                    continue ;;
+    esac
+    size=$(awk -v b="$(stat -f%z "$f" 2>/dev/null || stat -c%s "$f")" 'BEGIN{
+      if (b<1024) printf "%d B", b;
+      else if (b<1048576) printf "%.1f KB", b/1024;
+      else printf "%.1f MB", b/1048576
+    }')
+    printf '        <li><a href="data/%s" target="_blank" rel="noopener"><code>--%s</code> <span class="size">%s</span></a></li>\n' \
+      "$label" "$cap" "$size"
+  done
 }
 
 render_face_overlay() {
@@ -1191,13 +1265,20 @@ build_card() {
   fi
 
   local json_file="$DATA/$id.json"
-  local cmdline pretty title_e blurb_e license_e source_e
+  local cmdline pretty title_e blurb_e license_e source_e IMG_W IMG_H
   cmdline=$(render_cmdline "$args_json" "$filename")
-  pretty=$(render_combined_json "$id" | html_escape)
   title_e=$(echo "$title" | html_escape)
   blurb_e=$(echo "$blurb" | html_escape)
   license_e=$(echo "$license" | html_escape)
   source_e=$(echo "$source_url" | html_escape)
+
+  # Source image natural dimensions — needed to make every bbox thumbnail
+  # render with its REAL pixel-aspect ratio (not a forced square).
+  IMG_W=$(sips -g pixelWidth  "$IMAGES/$display_filename" 2>/dev/null | awk '/pixelWidth/{print $2}')
+  IMG_H=$(sips -g pixelHeight "$IMAGES/$display_filename" 2>/dev/null | awk '/pixelHeight/{print $2}')
+  IMG_W=${IMG_W:-1000}
+  IMG_H=${IMG_H:-1000}
+  export IMG_W IMG_H   # subshells from $() inherit env
 
   cat <<EOF
 <article class="card" id="$id">
@@ -1232,9 +1313,9 @@ $(render_barcodes_section "$json_file")
 $(render_faces_section "$json_file" "$display_filename")
 $(render_face_landmarks_section "$id" "$display_filename")
 $(render_animals_section "$id" "$display_filename")
-$(render_animal_pose_section "$id")
-$(render_body_pose_section "$id")
-$(render_hand_pose_section "$id")
+$(render_animal_pose_section "$id" "$display_filename")
+$(render_body_pose_section "$id" "$display_filename")
+$(render_hand_pose_section "$id" "$display_filename")
 $(render_aesthetics_section "$id")
 $(render_smudge_section "$id")
 $(render_saliency_section "$id" "attention" "saliency-attention" "$display_filename")
@@ -1242,15 +1323,22 @@ $(render_saliency_section "$id" "objectness" "saliency-objectness" "$display_fil
 $(render_rectangles_section "$id" "$display_filename")
 $(render_text_rectangles_section "$id" "$display_filename")
 $(render_horizon_section "$id")
-$(render_contours_section "$id")
+$(render_contours_section "$id" "$display_filename")
 $(render_feature_print_section "$id")
     <div class="section-block">
       <div class="section-head">
         <span class="icon json">{}</span>
         <span class="label">Raw JSON</span>
-        <span class="stats">all 14 capability runs · on-device</span>
+        <span class="stats">14 capability runs · on-device</span>
       </div>
-      <pre class="json-block">$pretty</pre>
+      <div class="json-summary">
+        Every Vision pass auge ran on this image. Click a file to see the full,
+        un-truncated output (vector embeddings, full landmark points,
+        every contour point — exactly what auge produced):
+      </div>
+      <ul class="json-links">
+$(json_link_list "$id")
+      </ul>
     </div>
     <a class="source-link" href="$source_e" target="_blank" rel="noopener">Wikimedia source</a>
   </div>
