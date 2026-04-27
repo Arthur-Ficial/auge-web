@@ -41,16 +41,21 @@ CORPUS_BARCODES=0
 CORPUS_CLASSIFY=0
 declare -A LANG_SET=()
 
-for json_file in "$DATA"/*.json; do
+# Only count primary item JSONs ($DATA/<id>.json) — not the enrichment files
+# ($DATA/<id>.aesthetics.json, etc.) added by run.sh in v1.3.
+manifest_count=$(jq '.items | length' "$MANIFEST")
+for i in $(seq 0 $((manifest_count - 1))); do
+    id=$(jq -r ".items[$i].id" "$MANIFEST")
+    json_file="$DATA/$id.json"
     [ -f "$json_file" ] || continue
     CORPUS_TOTAL=$((CORPUS_TOTAL + 1))
-    f_count=$(jq -r '.results.faces.count // 0' "$json_file" 2>/dev/null)
+    f_count=$(jq -r '(.results.faces.count // 0)' "$json_file" 2>/dev/null || echo 0)
     [ "${f_count:-0}" -gt 0 ] && CORPUS_FACES=$((CORPUS_FACES + 1))
-    o_count=$(jq -r '.results.ocr.lines | length // 0' "$json_file" 2>/dev/null)
+    o_count=$(jq -r '(.results.ocr.lines // .results.lines // []) | length' "$json_file" 2>/dev/null || echo 0)
     [ "${o_count:-0}" -gt 0 ] && CORPUS_OCR=$((CORPUS_OCR + 1))
-    b_count=$(jq -r '.results.barcodes.barcodes | length // 0' "$json_file" 2>/dev/null)
+    b_count=$(jq -r '(.results.barcodes.barcodes // []) | length' "$json_file" 2>/dev/null || echo 0)
     [ "${b_count:-0}" -gt 0 ] && CORPUS_BARCODES=$((CORPUS_BARCODES + 1))
-    c_count=$(jq -r '.results.classify.classifications | length // 0' "$json_file" 2>/dev/null)
+    c_count=$(jq -r '(.results.classify.classifications // []) | length' "$json_file" 2>/dev/null || echo 0)
     [ "${c_count:-0}" -gt 0 ] && CORPUS_CLASSIFY=$((CORPUS_CLASSIFY + 1))
 done
 
@@ -228,6 +233,7 @@ EOF
 
 render_faces_section() {
   local json_file="$1"
+  local image_file="$2"
   local items_json
   items_json=$(jq -c '.results.faces.faces // .results.faces // []' "$json_file" 2>/dev/null || echo '[]')
   local count
@@ -263,16 +269,872 @@ EOF
   local i=0
   echo "$items_json" | jq -c '.[]' | while IFS= read -r row; do
     i=$((i+1))
-    local x y w h
+    local x y w h thumb
     x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
     w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
-    printf '    <div>face %s: x=%.3f y=%.3f w=%.3f h=%.3f</div>\n' "$i" "$x" "$y" "$w" "$h"
+    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+    printf '    <div class="bbox-row">%s<span>face %s: x=%.3f y=%.3f w=%.3f h=%.3f</span></div>\n' "$thumb" "$i" "$x" "$y" "$w" "$h"
   done
 
   cat <<EOF
   </div>
 </div>
 EOF
+}
+
+## ---- v1.3 capability sections — each matches the existing section-block style.
+## Spatial results (saliency, rectangles, landmarks, animals, horizon) get drawn
+## as overlays on the image, just like the face bounding boxes do.
+
+render_aesthetics_section() {
+  local id="$1"
+  local f="$DATA/$id.aesthetics.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon aesthetics">★</span><span class="label">Aesthetics</span><span class="stats">no result</span></div>
+  <div class="empty-msg">CalculateImageAestheticsScoresRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local score util pct score_pct
+  score=$(jq -r '.results.aesthetics.overall // empty' "$f")
+  util=$(jq -r  '.results.aesthetics.isUtility // empty' "$f")
+  pct=$(awk "BEGIN { printf \"%.1f\", (($score) + 1) * 50 }")
+  score_pct=$(awk "BEGIN { printf \"%.3f\", $score }")
+  local label_class label_text
+  if [ "$util" = "true" ]; then label_class="util"; label_text="utility shot"
+  else label_class="memorable"; label_text="memorable"; fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon aesthetics">★</span><span class="label">Aesthetics</span><span class="stats">${score_pct}</span></div>
+  <div class="metric-row">
+    <div class="metric-bar"><div class="metric-bar-fill aesthetics" style="width:${pct}%"></div></div>
+    <div class="metric-tag ${label_class}">${label_text}</div>
+  </div>
+  <div class="metric-meta">overallScore range −1.00 utility → +1.00 memorable · ${pct}% along scale</div>
+</div>
+EOF
+}
+
+render_smudge_section() {
+  local id="$1"
+  local f="$DATA/$id.smudge.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon smudge">●</span><span class="label">Lens smudge</span><span class="stats">no result</span></div>
+  <div class="empty-msg">DetectLensSmudgeRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local conf pct verdict v_class
+  conf=$(jq -r '.results.smudge.confidence // empty' "$f")
+  pct=$(awk "BEGIN { printf \"%.2f\", $conf * 100 }")
+  if awk "BEGIN { exit !($conf < 0.05) }"; then verdict="clean lens"; v_class="ok"
+  elif awk "BEGIN { exit !($conf < 0.3) }"; then verdict="possibly smudged"; v_class="warn"
+  else verdict="smudged"; v_class="bad"; fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon smudge">●</span><span class="label">Lens smudge</span><span class="stats">${pct}%</span></div>
+  <div class="metric-row">
+    <div class="metric-bar"><div class="metric-bar-fill smudge" style="width:${pct}%"></div></div>
+    <div class="metric-tag ${v_class}">${verdict}</div>
+  </div>
+  <div class="metric-meta">confidence ${conf} · 0% clean · 100% smudged</div>
+</div>
+EOF
+}
+
+render_saliency_section() {
+  local id="$1"
+  local label="$2"
+  local mode="$3"
+  local image_file="$4"
+  local f="$DATA/$id.${mode}.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon saliency">◉</span><span class="label">Saliency · ${label}</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNGenerate${label^}BasedSaliencyImageRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.regions | length' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon saliency">◉</span><span class="label">Saliency · ${label}</span><span class="stats">0 regions</span></div>
+  <div class="empty-msg">No salient regions identified.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon saliency">◉</span><span class="label">Saliency · ${label}</span><span class="stats">${count} region$([ "$count" -ne 1 ] && echo s)</span></div>
+  <div class="saliency-summary">Where Apple Vision says the eye lands first. Boxes drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.regions[]' "$f" | nl -w1 -ba | while read -r idx row; do
+    local cx cy cw ch cconf thumb
+    cconf=$(echo "$row" | jq -r '.confidence')
+    cx=$(echo "$row"    | jq -r '.x'); cy=$(echo "$row" | jq -r '.y')
+    cw=$(echo "$row"    | jq -r '.width'); ch=$(echo "$row" | jq -r '.height')
+    thumb=$(bbox_thumb "$image_file" "$cx" "$cy" "$cw" "$ch")
+    printf '    <div class="bbox-row">%s<span>region %s — <strong>%.1f%%</strong> confidence — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$(awk "BEGIN{print $cconf*100}")" "$cx" "$cy" "$cw" "$ch"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_rectangles_section() {
+  local id="$1"
+  local image_file="$2"
+  local f="$DATA/$id.rectangles.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon rectangles">▱</span><span class="label">Quadrilaterals</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectRectanglesRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.rectangles | length' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon rectangles">▱</span><span class="label">Quadrilaterals</span><span class="stats">0 detected</span></div>
+  <div class="empty-msg">No four-cornered shapes found.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon rectangles">▱</span><span class="label">Quadrilaterals</span><span class="stats">${count} detected</span></div>
+  <div class="rect-summary">${count} four-cornered shape$([ "$count" -ne 1 ] && echo s) — paper, screens, signs. Outlined on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.rectangles[]' "$f" | nl -w1 -ba | while read -r idx row; do
+    local conf tlx tly trx try blx bly brx bry minx miny maxx maxy thumb
+    conf=$(echo "$row" | jq -r '.confidence')
+    tlx=$(echo "$row" | jq -r '.topLeft.x');     tly=$(echo "$row" | jq -r '.topLeft.y')
+    trx=$(echo "$row" | jq -r '.topRight.x');    try=$(echo "$row" | jq -r '.topRight.y')
+    blx=$(echo "$row" | jq -r '.bottomLeft.x');  bly=$(echo "$row" | jq -r '.bottomLeft.y')
+    brx=$(echo "$row" | jq -r '.bottomRight.x'); bry=$(echo "$row" | jq -r '.bottomRight.y')
+    # Compute the axis-aligned bounding box of the quad for the thumbnail.
+    minx=$(awk "BEGIN{m=$tlx; if($trx<m)m=$trx; if($blx<m)m=$blx; if($brx<m)m=$brx; print m}")
+    maxx=$(awk "BEGIN{m=$tlx; if($trx>m)m=$trx; if($blx>m)m=$blx; if($brx>m)m=$brx; print m}")
+    miny=$(awk "BEGIN{m=$tly; if($try<m)m=$try; if($bly<m)m=$bly; if($bry<m)m=$bry; print m}")
+    maxy=$(awk "BEGIN{m=$tly; if($try>m)m=$try; if($bly>m)m=$bly; if($bry>m)m=$bry; print m}")
+    local bw bh
+    bw=$(awk "BEGIN{print $maxx - $minx}")
+    bh=$(awk "BEGIN{print $maxy - $miny}")
+    thumb=$(bbox_thumb "$image_file" "$minx" "$miny" "$bw" "$bh")
+    printf '    <div class="bbox-row">%s<span>rect %s — <strong>%.1f%%</strong> confidence — corners tl(%.3f,%.3f) tr(%.3f,%.3f) bl(%.3f,%.3f) br(%.3f,%.3f)</span></div>\n' \
+      "$thumb" "$idx" "$(awk "BEGIN{print $conf*100}")" "$tlx" "$tly" "$trx" "$try" "$blx" "$bly" "$brx" "$bry"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_horizon_section() {
+  local id="$1"
+  local f="$DATA/$id.horizon.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon horizon">⏤</span><span class="label">Horizon</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectHorizonRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local rad deg
+  rad=$(jq -r '.results.horizon.angleRadians // empty' "$f")
+  deg=$(jq -r '.results.horizon.angleDegrees // empty' "$f")
+  if [ -z "$rad" ] || [ "$rad" = "null" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon horizon">⏤</span><span class="label">Horizon</span><span class="stats">no horizon</span></div>
+  <div class="empty-msg">No horizon line detected (no clear sky/ground separation).</div>
+</div>
+EOF
+    return
+  fi
+  local abs_deg verdict v_class
+  abs_deg=$(awk "BEGIN { v = $deg; if (v<0) v=-v; printf \"%.2f\", v }")
+  if awk "BEGIN { exit !($abs_deg < 1) }"; then verdict="level"; v_class="ok"
+  elif awk "BEGIN { exit !($abs_deg < 5) }"; then verdict="slight tilt"; v_class="warn"
+  else verdict="tilted"; v_class="bad"; fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon horizon">⏤</span><span class="label">Horizon</span><span class="stats">$(printf '%.2f°' "$deg")</span></div>
+  <div class="horizon-row">
+    <div class="horizon-dial"><div class="horizon-needle" style="transform: rotate(${deg}deg)"></div></div>
+    <div>
+      <div class="horizon-val">$(printf '%.2f°' "$deg") <span class="metric-tag ${v_class}">${verdict}</span></div>
+      <div class="horizon-meta">$(printf '%.4f' "$rad") rad · drawn on image as overlay</div>
+    </div>
+  </div>
+</div>
+EOF
+}
+
+render_face_landmarks_section() {
+  local id="$1"
+  local image_file="$2"
+  local f="$DATA/$id.face-landmarks.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon landmarks">⨯</span><span class="label">Face landmarks</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectFaceLandmarksRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.faces | length' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon landmarks">⨯</span><span class="label">Face landmarks</span><span class="stats">0 faces</span></div>
+  <div class="empty-msg">No faces detected, so no landmarks.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon landmarks">⨯</span><span class="label">Face landmarks</span><span class="stats">${count} face$([ "$count" -ne 1 ] && echo s) · 76 pts each</span></div>
+  <div class="landmarks-summary">Per-face roll / yaw / pitch (head pose) and ~76 anchor points (eyes, brows, nose, lips, jawline, pupils). Points drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.faces[]' "$f" | nl -w1 -ba | while read -r idx face; do
+    local x y w h roll yaw pitch thumb
+    x=$(echo "$face" | jq -r '.x');     y=$(echo "$face" | jq -r '.y')
+    w=$(echo "$face" | jq -r '.width'); h=$(echo "$face" | jq -r '.height')
+    roll=$(echo "$face"  | jq -r '.roll  // empty')
+    yaw=$(echo "$face"   | jq -r '.yaw   // empty')
+    pitch=$(echo "$face" | jq -r '.pitch // empty')
+    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+
+    local pose_html
+    if [ -n "$roll" ] && [ "$roll" != "null" ] && [ -n "$yaw" ] && [ -n "$pitch" ]; then
+      local r_deg y_deg p_deg
+      r_deg=$(awk "BEGIN { printf \"%.2f\", $roll * 180 / 3.141592653589793 }")
+      y_deg=$(awk "BEGIN { printf \"%.2f\", $yaw  * 180 / 3.141592653589793 }")
+      p_deg=$(awk "BEGIN { printf \"%.2f\", $pitch * 180 / 3.141592653589793 }")
+      pose_html="roll <strong>${r_deg}°</strong> · yaw <strong>${y_deg}°</strong> · pitch <strong>${p_deg}°</strong>"
+    else
+      pose_html='<em class="dim">pose not reported</em>'
+    fi
+
+    printf '    <div class="bbox-row">%s<span>face %s — bbox=(%.3f, %.3f, %.3f, %.3f) — %s</span></div>\n' \
+      "$thumb" "$idx" "$x" "$y" "$w" "$h" "$pose_html"
+
+    # Then enumerate every landmark region: name + actual point count.
+    echo "$face" | jq -r '.landmarks | to_entries[] | "      <div class=\"lm-region\">  · \(.key): <strong>\(.value | length)</strong> points</div>"'
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_animals_section() {
+  local id="$1"
+  local image_file="$2"
+  local f="$DATA/$id.animals.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon animals">⌒</span><span class="label">Animals (cat/dog)</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNRecognizeAnimalsRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.count // 0' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon animals">⌒</span><span class="label">Animals (cat/dog)</span><span class="stats">0 detected</span></div>
+  <div class="empty-msg">No cats or dogs detected by VNRecognizeAnimalsRequest. (The recognizer is conservative — paintings, distant or partial subjects often score below threshold.)</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon animals">⌒</span><span class="label">Animals (cat/dog)</span><span class="stats">${count} detected</span></div>
+  <div class="animals-summary">Cat / dog detection with bounding boxes — drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.animals[]' "$f" | nl -w1 -ba | while read -r idx row; do
+    local lab conf x y w h thumb
+    lab=$(echo "$row"  | jq -r '.label')
+    conf=$(echo "$row" | jq -r '.confidence')
+    x=$(echo "$row"  | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row"  | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+    printf '    <div class="bbox-row">%s<span>%s. <strong>%s</strong> — %.1f%% confidence — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$(echo "$lab" | html_escape)" "$(awk "BEGIN{print $conf*100}")" "$x" "$y" "$w" "$h"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+# ---- Pose: body / hand / animal — skeleton list + image overlay ----
+
+render_body_pose_section() {
+  local id="$1"
+  local f="$DATA/$id.body-pose.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-body">⩎</span><span class="label">Body pose</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectHumanBodyPoseRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.count // 0' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-body">⩎</span><span class="label">Body pose</span><span class="stats">0 bodies</span></div>
+  <div class="empty-msg">No human body poses detected.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-body">⩎</span><span class="label">Body pose</span><span class="stats">${count} bod$([ "$count" -ne 1 ] && echo ies || echo y)</span></div>
+  <div class="landmarks-summary">19 named joints per body — head, ears, eyes, neck, shoulders, elbows, wrists, root, hips, knees, ankles. Skeleton drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.bodies[]' "$f" | nl -w1 -ba | while read -r idx body; do
+    local jcount avg
+    jcount=$(echo "$body" | jq -r '.joints | length')
+    avg=$(echo "$body" | jq -r '[.joints[].confidence] | add / length')
+    printf '    <div>body %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong></div>\n' \
+      "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_hand_pose_section() {
+  local id="$1"
+  local f="$DATA/$id.hand-pose.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-hand">✋</span><span class="label">Hand pose</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectHumanHandPoseRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.count // 0' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-hand">✋</span><span class="label">Hand pose</span><span class="stats">0 hands</span></div>
+  <div class="empty-msg">No hands detected.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-hand">✋</span><span class="label">Hand pose</span><span class="stats">${count} hand$([ "$count" -ne 1 ] && echo s)</span></div>
+  <div class="landmarks-summary">21 keypoints per hand (wrist + 4 per finger). Chirality (left / right / unknown) reported per hand. Skeleton drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.hands[]' "$f" | nl -w1 -ba | while read -r idx hand; do
+    local chirality jcount avg
+    chirality=$(echo "$hand" | jq -r '.chirality')
+    jcount=$(echo "$hand"    | jq -r '.joints | length')
+    avg=$(echo "$hand"       | jq -r '[.joints[].confidence] | add / length')
+    printf '    <div>hand %s — <strong>%s</strong> — %s joints — avg confidence <strong>%.1f%%</strong></div>\n' \
+      "$idx" "$chirality" "$jcount" "$(awk "BEGIN{print $avg*100}")"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_animal_pose_section() {
+  local id="$1"
+  local f="$DATA/$id.animal-pose.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-animal">🐾</span><span class="label">Animal pose</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectAnimalBodyPoseRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.count // 0' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-animal">🐾</span><span class="label">Animal pose</span><span class="stats">0 animals</span></div>
+  <div class="empty-msg">No animal body poses detected.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon pose-animal">🐾</span><span class="label">Animal pose</span><span class="stats">${count} animal$([ "$count" -ne 1 ] && echo s)</span></div>
+  <div class="landmarks-summary">Up to 25 named joints (ears, eyes, neck, shoulders, elbows, knees, paws, tail). Skeleton drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.animals[]' "$f" | nl -w1 -ba | while read -r idx an; do
+    local jcount avg
+    jcount=$(echo "$an" | jq -r '.joints | length')
+    avg=$(echo "$an"    | jq -r '[.joints[].confidence] | add / length')
+    printf '    <div>animal %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong></div>\n' \
+      "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_contours_section() {
+  local id="$1"
+  local f="$DATA/$id.contours.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon contours">∿</span><span class="label">Contours</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectContoursRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local total top sample
+  total=$(jq -r '.results.contours.contourCount // 0' "$f")
+  top=$(jq -r   '.results.contours.topLevelCount // 0' "$f")
+  sample=$(jq -r '.results.contours.paths | length' "$f")
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon contours">∿</span><span class="label">Contours</span><span class="stats">${total} total · ${top} top-level</span></div>
+  <div class="landmarks-summary">Vector edge contours of detected shapes. ${sample} path$([ "$sample" -ne 1 ] && echo s) drawn on the image above (sampled from top-level).</div>
+  <div class="data-list">
+EOF
+  if [ "$sample" -gt 0 ]; then
+    jq -c '.results.contours.paths[]' "$f" | nl -w1 -ba | while read -r idx p; do
+      local pc
+      pc=$(echo "$p" | jq -r '.pointCount')
+      printf '    <div>path %s — <strong>%s</strong> points</div>\n' "$idx" "$pc"
+    done
+  else
+    echo '    <div class="empty-msg">No top-level contours.</div>'
+  fi
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_text_rectangles_section() {
+  local id="$1"
+  local image_file="$2"
+  local f="$DATA/$id.text-rectangles.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon textrects">▭</span><span class="label">Text regions</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNDetectTextRectanglesRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count
+  count=$(jq -r '.results.rectangles | length' "$f")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon textrects">▭</span><span class="label">Text regions</span><span class="stats">0 detected</span></div>
+  <div class="empty-msg">No text regions detected by the cheap probe.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon textrects">▭</span><span class="label">Text regions</span><span class="stats">${count} detected</span></div>
+  <div class="landmarks-summary">Lightweight text-region detector (just bounding boxes — no recognition). Boxes drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.rectangles[]' "$f" | nl -w1 -ba | while read -r idx row; do
+    local conf x y w h thumb
+    conf=$(echo "$row" | jq -r '.confidence')
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    thumb=$(bbox_thumb "$image_file" "$x" "$y" "$w" "$h")
+    printf '    <div class="bbox-row">%s<span>region %s — <strong>%.1f%%</strong> confidence — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$(awk "BEGIN{print $conf*100}")" "$x" "$y" "$w" "$h"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_feature_print_section() {
+  local id="$1"
+  local f="$DATA/$id.feature-print.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon embedding">⊟</span><span class="label">Feature print (embedding)</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNGenerateImageFeaturePrintRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local dim type first
+  dim=$(jq  -r '.results.featurePrint.dimension // 0' "$f")
+  type=$(jq -r '.results.featurePrint.elementType // ""' "$f")
+  first=$(jq -r '.results.featurePrint.vector[0:8] | map(. * 1000 | round / 1000) | @csv' "$f" 2>/dev/null | tr -d '"')
+  # Build a sparkline of the first 64 dims by rendering a tiny SVG bar chart.
+  local spark
+  spark=$(jq -c '.results.featurePrint.vector[0:64]' "$f" 2>/dev/null | python3 "$ROOT/scripts/_fp_spark.py")
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon embedding">⊟</span><span class="label">Feature print (embedding)</span><span class="stats">${dim}-D · ${type}</span></div>
+  <div class="landmarks-summary">Fixed-length descriptor (image embedding). Used for similarity / dedup via cosine distance. Sparkline shows the first 64 of ${dim} dimensions.</div>
+  ${spark}
+  <div class="data-list">
+    <div>first 8 values: <code>${first}</code></div>
+  </div>
+</div>
+EOF
+}
+
+## ---- Image overlays — drawn on top of the image inside .card-image-frame.
+
+render_saliency_overlay() {
+  local id="$1"
+  local f="$DATA/$id.saliency-attention.json"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r '.results.regions | length' "$f")
+  [ "$count" = "0" ] && return
+  echo '<div class="saliency-overlay">'
+  jq -c '.results.regions[]' "$f" | nl -w1 -ba | while read -r idx row; do
+    local x y w h conf left top width height
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    conf=$(echo "$row" | jq -r '.confidence')
+    left=$(awk "BEGIN { printf \"%.2f\", $x * 100 }")
+    top=$(awk "BEGIN { printf \"%.2f\", (1 - $y - $h) * 100 }")
+    width=$(awk "BEGIN { printf \"%.2f\", $w * 100 }")
+    height=$(awk "BEGIN { printf \"%.2f\", $h * 100 }")
+    printf '<div class="saliency-box" style="left:%s%%;top:%s%%;width:%s%%;height:%s%%"><div class="label">attention %s · %.0f%%</div></div>\n' \
+      "$left" "$top" "$width" "$height" "$idx" "$(awk "BEGIN{print $conf*100}")"
+  done
+  echo '</div>'
+}
+
+render_rectangles_overlay() {
+  local id="$1"
+  local f="$DATA/$id.rectangles.json"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r '.results.rectangles | length' "$f")
+  [ "$count" = "0" ] && return
+  echo '<svg class="rect-overlay" viewBox="0 0 100 100" preserveAspectRatio="none">'
+  jq -c '.results.rectangles[]' "$f" | nl -w1 -ba | while read -r idx row; do
+    # 4 corner points; Vision is bottom-origin so flip Y for SVG.
+    local tlx tly trx try blx bly brx bry
+    tlx=$(echo "$row" | jq -r '.topLeft.x');     tly=$(echo "$row" | jq -r '.topLeft.y')
+    trx=$(echo "$row" | jq -r '.topRight.x');    try=$(echo "$row" | jq -r '.topRight.y')
+    blx=$(echo "$row" | jq -r '.bottomLeft.x');  bly=$(echo "$row" | jq -r '.bottomLeft.y')
+    brx=$(echo "$row" | jq -r '.bottomRight.x'); bry=$(echo "$row" | jq -r '.bottomRight.y')
+    printf '<polygon points="%.2f,%.2f %.2f,%.2f %.2f,%.2f %.2f,%.2f"/>' \
+      "$(awk "BEGIN{print $tlx*100}")" "$(awk "BEGIN{print (1-$tly)*100}")" \
+      "$(awk "BEGIN{print $trx*100}")" "$(awk "BEGIN{print (1-$try)*100}")" \
+      "$(awk "BEGIN{print $brx*100}")" "$(awk "BEGIN{print (1-$bry)*100}")" \
+      "$(awk "BEGIN{print $blx*100}")" "$(awk "BEGIN{print (1-$bly)*100}")"
+  done
+  echo '</svg>'
+}
+
+render_horizon_overlay() {
+  local id="$1"
+  local f="$DATA/$id.horizon.json"
+  [ -f "$f" ] || return
+  local deg
+  deg=$(jq -r '.results.horizon.angleDegrees // empty' "$f")
+  [ -z "$deg" ] || [ "$deg" = "null" ] && return
+  printf '<div class="horizon-overlay"><div class="horizon-line" style="transform:translate(-50%%,-50%%) rotate(%sdeg)"></div></div>\n' "$deg"
+}
+
+render_landmarks_overlay() {
+  local id="$1"
+  local f="$DATA/$id.face-landmarks.json"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r '.results.faces | length' "$f")
+  [ "$count" = "0" ] && return
+  echo '<svg class="lm-overlay" viewBox="0 0 1 1" preserveAspectRatio="none">'
+  jq -c '.results.faces[]' "$f" | while IFS= read -r face; do
+    # Each face has bbox + landmarks dict. Landmark points are normalized
+    # *within the face bounding box*, so map them to image coords:
+    # imageX = bbox.x + pt.x * bbox.width
+    # imageY = bbox.y + pt.y * bbox.height (bottom-origin)
+    local fx fy fw fh
+    fx=$(echo "$face" | jq -r '.x');     fy=$(echo "$face" | jq -r '.y')
+    fw=$(echo "$face" | jq -r '.width'); fh=$(echo "$face" | jq -r '.height')
+    echo "$face" | jq -c '.landmarks | to_entries[] | .value[]' 2>/dev/null \
+      | while IFS= read -r pt; do
+          local px py imgx imgy
+          px=$(echo "$pt" | jq -r '.x'); py=$(echo "$pt" | jq -r '.y')
+          imgx=$(awk "BEGIN{print $fx + $px * $fw}")
+          imgy=$(awk "BEGIN{print 1 - ($fy + $py * $fh)}")
+          printf '<circle cx="%.4f" cy="%.4f" r="0.0035"/>' "$imgx" "$imgy"
+        done
+  done
+  echo '</svg>'
+}
+
+render_animals_overlay() {
+  local id="$1"
+  local f="$DATA/$id.animals.json"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r '.results.count // 0' "$f")
+  [ "$count" = "0" ] && return
+  echo '<div class="animals-overlay">'
+  jq -c '.results.animals[]' "$f" | nl -w1 -ba | while read -r idx row; do
+    local x y w h lab conf left top width height
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    lab=$(echo "$row" | jq -r '.label')
+    conf=$(echo "$row" | jq -r '.confidence')
+    left=$(awk "BEGIN { printf \"%.2f\", $x * 100 }")
+    top=$(awk "BEGIN { printf \"%.2f\", (1 - $y - $h) * 100 }")
+    width=$(awk "BEGIN { printf \"%.2f\", $w * 100 }")
+    height=$(awk "BEGIN { printf \"%.2f\", $h * 100 }")
+    printf '<div class="animal-box" style="left:%s%%;top:%s%%;width:%s%%;height:%s%%"><div class="label">%s · %.0f%%</div></div>\n' \
+      "$left" "$top" "$width" "$height" "$(echo "$lab" | html_escape)" "$(awk "BEGIN{print $conf*100}")"
+  done
+  echo '</div>'
+}
+
+# ---- Skeleton overlays for body / hand / animal pose ----
+# Edge tables: each "from:to" line wires two named joints into a bone.
+
+BODY_EDGES='head_joint:neck_1_joint
+head_joint:left_ear_joint
+head_joint:right_ear_joint
+left_ear_joint:left_eye_joint
+right_ear_joint:right_eye_joint
+neck_1_joint:left_shoulder_1_joint
+neck_1_joint:right_shoulder_1_joint
+neck_1_joint:root
+left_shoulder_1_joint:left_forearm_joint
+left_forearm_joint:left_hand_joint
+right_shoulder_1_joint:right_forearm_joint
+right_forearm_joint:right_hand_joint
+root:left_upLeg_joint
+left_upLeg_joint:left_leg_joint
+left_leg_joint:left_foot_joint
+root:right_upLeg_joint
+right_upLeg_joint:right_leg_joint
+right_leg_joint:right_foot_joint'
+
+# Vision hand-pose joint codes:
+# VNHLKWRI=wrist
+# VNHLKT[CMC|MP|IP|TIP]=thumb chain
+# VNHLK[I|M|R|P][MCP|PIP|DIP|TIP]=index/middle/ring/pinky chains
+HAND_EDGES='VNHLKWRI:VNHLKTCMC
+VNHLKTCMC:VNHLKTMP
+VNHLKTMP:VNHLKTIP
+VNHLKTIP:VNHLKTTIP
+VNHLKWRI:VNHLKIMCP
+VNHLKIMCP:VNHLKIPIP
+VNHLKIPIP:VNHLKIDIP
+VNHLKIDIP:VNHLKITIP
+VNHLKWRI:VNHLKMMCP
+VNHLKMMCP:VNHLKMPIP
+VNHLKMPIP:VNHLKMDIP
+VNHLKMDIP:VNHLKMTIP
+VNHLKWRI:VNHLKRMCP
+VNHLKRMCP:VNHLKRPIP
+VNHLKRPIP:VNHLKRDIP
+VNHLKRDIP:VNHLKRTIP
+VNHLKWRI:VNHLKPMCP
+VNHLKPMCP:VNHLKPPIP
+VNHLKPPIP:VNHLKPDIP
+VNHLKPDIP:VNHLKPTIP'
+
+ANIMAL_EDGES='animal_joint_left_eye:animal_joint_right_eye
+animal_joint_left_eye:animal_joint_nose
+animal_joint_right_eye:animal_joint_nose
+animal_joint_left_ear_top:animal_joint_left_ear_middle
+animal_joint_left_ear_middle:animal_joint_left_ear_bottom
+animal_joint_right_ear_top:animal_joint_right_ear_middle
+animal_joint_right_ear_middle:animal_joint_right_ear_bottom
+animal_joint_neck:animal_joint_heck
+animal_joint_neck:animal_joint_left_front_elbow
+animal_joint_left_front_elbow:animal_joint_left_front_knee
+animal_joint_left_front_knee:animal_joint_left_front_paw
+animal_joint_neck:animal_joint_right_front_elbow
+animal_joint_right_front_elbow:animal_joint_right_front_knee
+animal_joint_right_front_knee:animal_joint_right_front_paw
+animal_joint_heck:animal_joint_left_back_elbow
+animal_joint_left_back_elbow:animal_joint_left_back_knee
+animal_joint_left_back_knee:animal_joint_left_back_paw
+animal_joint_heck:animal_joint_right_back_elbow
+animal_joint_right_back_elbow:animal_joint_right_back_knee
+animal_joint_right_back_knee:animal_joint_right_back_paw
+animal_joint_heck:animal_joint_tail_top
+animal_joint_tail_top:animal_joint_tail_middle
+animal_joint_tail_middle:animal_joint_tail_bottom'
+
+# Render skeleton SVG. Args: $1 data file path, $2 outer-array JSONPath
+# (e.g. ".results.bodies[]" or ".results.hands[]" or ".results.animals[]"),
+# $3 edges-string variable, $4 svg-class.
+render_skeleton_svg() {
+  local f="$1"; local items_path="$2"; local edges="$3"; local cls="$4"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r "${items_path%[]} | length // 0" "$f" 2>/dev/null)
+  [ "${count:-0}" = "0" ] && return
+  echo "<svg class=\"$cls\" viewBox=\"0 0 1 1\" preserveAspectRatio=\"none\">"
+  # For each instance, emit bones (edges) then dots.
+  local instance_idx=0
+  jq -c "$items_path" "$f" 2>/dev/null | while IFS= read -r inst; do
+    instance_idx=$((instance_idx+1))
+    # Gather joints into a temp lookup: joint_name -> "x y conf"
+    local map_file
+    map_file=$(mktemp)
+    echo "$inst" | jq -r '.joints[] | "\(.name) \(.x) \(.y) \(.confidence)"' > "$map_file"
+    # Emit bone lines.
+    while IFS=: read -r a b; do
+      [ -z "$a" ] && continue
+      local ar br
+      ar=$(awk -v n="$a" '$1==n {print $2,$3,$4; exit}' "$map_file")
+      br=$(awk -v n="$b" '$1==n {print $2,$3,$4; exit}' "$map_file")
+      [ -z "$ar" ] || [ -z "$br" ] && continue
+      local ax ay aconf bx by bconf
+      ax=$(echo "$ar" | awk '{print $1}'); ay=$(echo "$ar" | awk '{print $2}'); aconf=$(echo "$ar" | awk '{print $3}')
+      bx=$(echo "$br" | awk '{print $1}'); by=$(echo "$br" | awk '{print $2}'); bconf=$(echo "$br" | awk '{print $3}')
+      # Skip near-zero-confidence joints.
+      awk "BEGIN{ exit !($aconf < 0.05 || $bconf < 0.05) }" && continue
+      printf '<line x1="%.4f" y1="%.4f" x2="%.4f" y2="%.4f"/>' \
+        "$ax" "$(awk "BEGIN{print 1 - $ay}")" \
+        "$bx" "$(awk "BEGIN{print 1 - $by}")"
+    done <<< "$edges"
+    # Emit joint dots.
+    while IFS= read -r line; do
+      local jx jy jc
+      jx=$(echo "$line" | awk '{print $2}')
+      jy=$(echo "$line" | awk '{print $3}')
+      jc=$(echo "$line" | awk '{print $4}')
+      awk "BEGIN{ exit !($jc < 0.05) }" && continue
+      printf '<circle cx="%.4f" cy="%.4f" r="0.006"/>' \
+        "$jx" "$(awk "BEGIN{print 1 - $jy}")"
+    done < "$map_file"
+    rm -f "$map_file"
+  done
+  echo '</svg>'
+}
+
+render_body_pose_overlay() {
+  python3 "$ROOT/scripts/_skeleton.py" "$DATA/$1.body-pose.json"   body   "skel-overlay body"   2>/dev/null
+}
+render_hand_pose_overlay() {
+  python3 "$ROOT/scripts/_skeleton.py" "$DATA/$1.hand-pose.json"   hand   "skel-overlay hand"   2>/dev/null
+}
+render_animal_pose_overlay() {
+  python3 "$ROOT/scripts/_skeleton.py" "$DATA/$1.animal-pose.json" animal "skel-overlay animal" 2>/dev/null
+}
+
+# Emit a tiny SVG thumbnail of the image cropped to a bbox. Used inside lists
+# next to numeric coordinates. Args: $1 image_basename, $2 x, $3 y, $4 w, $5 h
+bbox_thumb() {
+  python3 "$ROOT/scripts/_bbox_thumb.py" "images/$1" "$2" "$3" "$4" "$5" 2>/dev/null
+}
+
+render_contours_overlay() {
+  local id="$1"
+  local f="$DATA/$id.contours.json"
+  [ -f "$f" ] || return
+  local sample
+  sample=$(jq -r '.results.contours.paths | length' "$f")
+  [ "${sample:-0}" = "0" ] && return
+  echo '<svg class="contour-overlay" viewBox="0 0 1 1" preserveAspectRatio="none">'
+  jq -c '.results.contours.paths[]' "$f" 2>/dev/null | while IFS= read -r p; do
+    local d
+    d=$(echo "$p" | jq -r '.points | to_entries | map(if .key==0 then "M\(.value.x) \(1 - .value.y)" else "L\(.value.x) \(1 - .value.y)" end) | join(" ")')
+    if [ -n "$d" ]; then
+      printf '<path d="%s Z"/>' "$d"
+    fi
+  done
+  echo '</svg>'
+}
+
+render_text_rectangles_overlay() {
+  local id="$1"
+  local f="$DATA/$id.text-rectangles.json"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r '.results.rectangles | length' "$f")
+  [ "$count" = "0" ] && return
+  echo '<div class="textrect-overlay">'
+  jq -c '.results.rectangles[]' "$f" | while IFS= read -r row; do
+    local x y w h left top width height
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    left=$(awk "BEGIN { printf \"%.2f\", $x * 100 }")
+    top=$(awk  "BEGIN { printf \"%.2f\", (1 - $y - $h) * 100 }")
+    width=$(awk "BEGIN { printf \"%.2f\", $w * 100 }")
+    height=$(awk "BEGIN { printf \"%.2f\", $h * 100 }")
+    printf '<div class="textrect-box" style="left:%s%%;top:%s%%;width:%s%%;height:%s%%"></div>' \
+      "$left" "$top" "$width" "$height"
+  done
+  echo '</div>'
+}
+
+# Combined raw JSON: merge --all output + every enrichment capability into one
+# big object so the "Raw JSON" block reflects all Vision passes. The feature-print
+# vector is truncated to 8 elements to keep the page under 1MB.
+render_combined_json() {
+  python3 "$ROOT/scripts/_combine_json.py" "$DATA" "$1"
 }
 
 render_face_overlay() {
@@ -331,7 +1193,7 @@ build_card() {
   local json_file="$DATA/$id.json"
   local cmdline pretty title_e blurb_e license_e source_e
   cmdline=$(render_cmdline "$args_json" "$filename")
-  pretty=$(pretty_json_file "$json_file" | html_escape)
+  pretty=$(render_combined_json "$id" | html_escape)
   title_e=$(echo "$title" | html_escape)
   blurb_e=$(echo "$blurb" | html_escape)
   license_e=$(echo "$license" | html_escape)
@@ -342,6 +1204,16 @@ build_card() {
   <div class="card-image">
     <div class="card-image-frame">
       <img src="images/$(echo "$display_filename" | html_escape)" alt="$title_e" loading="lazy">
+$(render_horizon_overlay "$id")
+$(render_contours_overlay "$id")
+$(render_text_rectangles_overlay "$id")
+$(render_rectangles_overlay "$id")
+$(render_saliency_overlay "$id")
+$(render_animals_overlay "$id")
+$(render_animal_pose_overlay "$id")
+$(render_body_pose_overlay "$id")
+$(render_hand_pose_overlay "$id")
+$(render_landmarks_overlay "$id")
 $(render_face_overlay "$json_file")
     </div>
   </div>
@@ -357,12 +1229,26 @@ $(render_face_overlay "$json_file")
 $(render_ocr_section "$json_file")
 $(render_classify_section "$json_file")
 $(render_barcodes_section "$json_file")
-$(render_faces_section "$json_file")
+$(render_faces_section "$json_file" "$display_filename")
+$(render_face_landmarks_section "$id" "$display_filename")
+$(render_animals_section "$id" "$display_filename")
+$(render_animal_pose_section "$id")
+$(render_body_pose_section "$id")
+$(render_hand_pose_section "$id")
+$(render_aesthetics_section "$id")
+$(render_smudge_section "$id")
+$(render_saliency_section "$id" "attention" "saliency-attention" "$display_filename")
+$(render_saliency_section "$id" "objectness" "saliency-objectness" "$display_filename")
+$(render_rectangles_section "$id" "$display_filename")
+$(render_text_rectangles_section "$id" "$display_filename")
+$(render_horizon_section "$id")
+$(render_contours_section "$id")
+$(render_feature_print_section "$id")
     <div class="section-block">
       <div class="section-head">
         <span class="icon json">{}</span>
         <span class="label">Raw JSON</span>
-        <span class="stats">on-device output</span>
+        <span class="stats">all 14 capability runs · on-device</span>
       </div>
       <pre class="json-block">$pretty</pre>
     </div>

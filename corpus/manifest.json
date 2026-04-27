@@ -892,6 +892,160 @@
       "auge_args": [
         "--all"
       ]
+    },
+    {
+      "id": "hachiko-loyal-dog",
+      "title": "Hachiko - the loyal Akita, c. 1934",
+      "year": 1934,
+      "category": "animals",
+      "license": "Public Domain (Japan, pre-1956)",
+      "source": "https://commons.wikimedia.org/wiki/File:Hachiko.JPG",
+      "wiki_file": "Hachiko.JPG",
+      "filename": "hachiko.jpg",
+      "blurb": "Hachiko, the Akita who waited at Shibuya station every day for nearly ten years after his owner died in 1925. A symbol of loyalty in Japan ever since. auge picks up the dog instantly with --animals.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "bald-eagle-usfws",
+      "title": "Bald Eagle - USFWS",
+      "year": 2010,
+      "category": "animals",
+      "license": "Public Domain (US Fish & Wildlife Service)",
+      "source": "https://commons.wikimedia.org/wiki/File:Bald_eagle_(5585350604).jpg",
+      "wiki_file": "Bald_eagle_(5585350604).jpg",
+      "filename": "bald-eagle.jpg",
+      "blurb": "America's national bird, photographed by USFWS. Apple Vision's bird recognition is sharp - and aesthetics scoring rates this kind of wildlife framing highly.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "yellowstone-bison",
+      "title": "American Bison - Yellowstone National Park",
+      "year": 2008,
+      "category": "animals",
+      "license": "Public Domain (US National Park Service)",
+      "source": "https://commons.wikimedia.org/wiki/File:American_bison_in_Yellowstone_National_Park.jpg",
+      "wiki_file": "American_bison_in_Yellowstone_National_Park.jpg",
+      "filename": "yellowstone-bison.jpg",
+      "blurb": "The largest land animal in North America, in the park that saved it from extinction in the 1890s. Yellowstone's herd is the only continuously wild population in the US.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "sea-otter-pup",
+      "title": "Sea Otter Mother with Pup",
+      "year": 2013,
+      "category": "animals",
+      "license": "Public Domain (USFWS)",
+      "source": "https://commons.wikimedia.org/wiki/File:Mother_sea_otter_with_rare_twin_baby_pups_(9137174915).jpg",
+      "wiki_file": "Mother_sea_otter_with_rare_twin_baby_pups_(9137174915).jpg",
+      "filename": "sea-otter-pup.jpg",
+      "blurb": "A southern sea otter mother carrying rare twin pups. Sea otters were hunted to ~50 individuals in California by 1911 - they're back, just barely. Cute index: maximum.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "laika-space-dog",
+      "title": "Laika - first animal in orbit, 1957",
+      "year": 1957,
+      "category": "animals",
+      "license": "Public Domain (Soviet origin, > 70 years)",
+      "source": "https://commons.wikimedia.org/wiki/File:Laika_in_1957.jpg",
+      "wiki_file": "Laika_in_1957.jpg",
+      "filename": "laika.jpg",
+      "blurb": "Laika, a stray Moscow mongrel, became the first living being to orbit Earth aboard Sputnik 2 on 3 November 1957. She did not survive the flight. The Soviet Union admitted this only in 2002.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "red-panda",
+      "title": "Red Panda",
+      "year": 2016,
+      "category": "animals",
+      "license": "CC-BY (Wikimedia Commons)",
+      "source": "https://commons.wikimedia.org/wiki/File:Red_Panda_(24986761703).jpg",
+      "wiki_file": "Red_Panda_(24986761703).jpg",
+      "filename": "red-panda.jpg",
+      "blurb": "Endangered, native to the eastern Himalayas. Despite the name, not closely related to the giant panda - red pandas are their own family. Mostly bamboo, occasionally insects.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "cute-kitten",
+      "title": "Cute grey kitten",
+      "year": 2014,
+      "category": "animals",
+      "license": "CC-BY-SA",
+      "source": "https://commons.wikimedia.org/wiki/File:Cute_grey_kitten.jpg",
+      "wiki_file": "Cute_grey_kitten.jpg",
+      "filename": "cute-kitten.jpg",
+      "blurb": "A baseline test of Apple Vision's animal classifier on what may be the most common photo subject on the open internet.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "adelie-penguins",
+      "title": "Adelie Penguins on iceberg",
+      "year": 2010,
+      "category": "animals",
+      "license": "Public Domain (US Antarctic Program)",
+      "source": "https://commons.wikimedia.org/wiki/File:Adelie_Penguins_on_iceberg.jpg",
+      "wiki_file": "Adelie_Penguins_on_iceberg.jpg",
+      "filename": "adelie-penguins.jpg",
+      "blurb": "A line of Adelie penguins on a tabular iceberg in the Ross Sea. They breed only on the Antarctic continent. Climate-change canary species.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "galapagos-tortoise",
+      "title": "Galapagos giant tortoise",
+      "year": 2007,
+      "category": "animals",
+      "license": "CC-BY",
+      "source": "https://commons.wikimedia.org/wiki/File:Galapagos_giant_tortoise_Geochelone_elephantopus.jpg",
+      "wiki_file": "Galapagos_giant_tortoise_Geochelone_elephantopus.jpg",
+      "filename": "galapagos-tortoise.jpg",
+      "blurb": "A Galapagos giant tortoise. Darwin spent five weeks on the islands in 1835 - the variation in tortoise shells across islands seeded On the Origin of Species. They live up to 170 years.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "atlantic-puffin",
+      "title": "Atlantic Puffin",
+      "year": 2010,
+      "category": "animals",
+      "license": "CC-BY-SA",
+      "source": "https://commons.wikimedia.org/wiki/File:Puffin_(2).jpg",
+      "wiki_file": "Puffin_(2).jpg",
+      "filename": "puffin.jpg",
+      "blurb": "An Atlantic puffin in breeding plumage - the colourful beak is shed in winter. They mate for life and can hold a dozen fish crosswise in their bill before swallowing.",
+      "auge_args": [
+        "--all"
+      ]
+    },
+    {
+      "id": "knut-polar-bear",
+      "title": "Knut - Berlin Zoo polar bear cub",
+      "year": 2007,
+      "category": "animals",
+      "license": "CC-BY-SA",
+      "source": "https://commons.wikimedia.org/wiki/File:Knut_IMG_8095.jpg",
+      "wiki_file": "Knut_IMG_8095.jpg",
+      "filename": "knut.jpg",
+      "blurb": "Knut, the polar bear cub born at Berlin Zoo in December 2006 and hand-raised after his mother rejected him. Became a global media phenomenon. Died young, in 2011.",
+      "auge_args": [
+        "--all"
+      ]
     }
   ]
 }

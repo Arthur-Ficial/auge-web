@@ -755,6 +755,269 @@
     .section-head .icon.barcodes { background: rgba(245,158,11,0.12); color: var(--amber-500); }
     .section-head .icon.faces    { background: rgba(236,72,153,0.12); color: var(--pink-500); }
     .section-head .icon.json     { background: var(--gray-100); color: var(--gray-700); }
+    /* New v1.3 capability icons (each colour-coded). */
+    .section-head .icon.aesthetics { background: rgba(245,158,11,0.12);  color: var(--amber-500); }
+    .section-head .icon.smudge     { background: rgba(107,114,128,0.12); color: var(--gray-600); }
+    .section-head .icon.saliency   { background: rgba(45,212,191,0.18);  color: #0d9488; }
+    .section-head .icon.rectangles { background: rgba(99,102,241,0.12);  color: var(--indigo-700); }
+    .section-head .icon.horizon    { background: rgba(245,158,11,0.12);  color: var(--amber-500); }
+    .section-head .icon.landmarks  { background: rgba(236,72,153,0.12);  color: var(--pink-500); }
+    .section-head .icon.animals    { background: rgba(34,197,94,0.12);   color: var(--green-600); }
+    .section-head .icon.pose-body  { background: rgba(168,85,247,0.14);  color: #7c3aed; }
+    .section-head .icon.pose-hand  { background: rgba(217,70,239,0.14);  color: #a21caf; }
+    .section-head .icon.pose-animal{ background: rgba(34,197,94,0.14);   color: var(--green-600); }
+    .section-head .icon.contours   { background: rgba(20,184,166,0.14);  color: #0d9488; }
+    .section-head .icon.textrects  { background: rgba(99,102,241,0.10);  color: var(--indigo-700); }
+    .section-head .icon.embedding  { background: rgba(15,23,42,0.10);    color: var(--gray-700); }
+
+    /* Generic data-list reused across new sections (mono, dim, tight). */
+    .data-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--gray-700);
+    }
+    .data-list strong { color: var(--gray-900); font-weight: 700; }
+    .data-list code   { font-size: 11.5px; color: var(--gray-600); }
+
+    /* Metric bars (aesthetics, smudge). */
+    .metric-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 4px; flex-wrap: wrap;
+    }
+    .metric-bar {
+      flex: 1 1 200px;
+      height: 12px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: 999px;
+      overflow: hidden;
+      min-width: 160px;
+    }
+    .metric-bar-fill {
+      height: 100%;
+      background: var(--indigo-500);
+      transition: width 0.4s ease;
+    }
+    .metric-bar-fill.aesthetics { background: linear-gradient(90deg, var(--amber-500), var(--pink-500), var(--indigo-500)); }
+    .metric-bar-fill.smudge     { background: linear-gradient(90deg, var(--green-500), var(--amber-500), var(--pink-500)); }
+    .metric-tag {
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      text-transform: lowercase;
+      white-space: nowrap;
+    }
+    .metric-tag.ok        { background: rgba(34,197,94,0.14);  color: var(--green-600); }
+    .metric-tag.warn      { background: rgba(245,158,11,0.14); color: var(--amber-500); }
+    .metric-tag.bad       { background: rgba(236,72,153,0.14); color: var(--pink-500); }
+    .metric-tag.memorable { background: rgba(34,197,94,0.14);  color: var(--green-600); }
+    .metric-tag.util      { background: rgba(245,158,11,0.14); color: var(--amber-500); }
+    .metric-meta {
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px; color: var(--gray-500);
+    }
+
+    /* Horizon dial: small circular widget showing the tilt angle. */
+    .horizon-row {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 6px;
+    }
+    .horizon-dial {
+      position: relative;
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(99,102,241,0.08), var(--gray-50));
+      border: 2px solid var(--gray-200);
+      flex-shrink: 0;
+    }
+    .horizon-needle {
+      position: absolute;
+      top: 50%; left: 12%;
+      width: 76%; height: 2px;
+      background: var(--amber-500);
+      transform-origin: 50% 50%;
+      box-shadow: 0 0 0 1px rgba(245,158,11,0.2);
+    }
+    .horizon-val {
+      font-family: var(--font-display, var(--font-sans));
+      font-weight: 700; font-size: 22px;
+      color: var(--gray-900);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .horizon-meta {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* Saliency / animals overlays (boxes on image). */
+    .saliency-overlay { position: absolute; inset: 0; pointer-events: none; }
+    .saliency-box {
+      position: absolute;
+      border: 2.5px solid #0d9488;
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px rgba(20,184,166,0.35), 0 4px 12px rgba(20,184,166,0.18);
+    }
+    .saliency-box .label {
+      position: absolute; top: -22px; left: -2px;
+      background: #0d9488; color: white;
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      padding: 1px 7px; border-radius: 3px;
+    }
+
+    .animals-overlay { position: absolute; inset: 0; pointer-events: none; }
+    .animal-box {
+      position: absolute;
+      border: 2.5px solid var(--green-600);
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.35), 0 4px 12px rgba(34,197,94,0.18);
+    }
+    .animal-box .label {
+      position: absolute; top: -22px; left: -2px;
+      background: var(--green-600); color: white;
+      font-family: var(--font-mono);
+      font-size: 11px; font-weight: 600;
+      padding: 1px 7px; border-radius: 3px;
+    }
+
+    /* Text-rectangles overlay (subtler dashed). */
+    .textrect-overlay { position: absolute; inset: 0; pointer-events: none; }
+    .textrect-box {
+      position: absolute;
+      border: 1.5px dashed rgba(99,102,241,0.7);
+      border-radius: 2px;
+      background: rgba(99,102,241,0.05);
+    }
+
+    /* SVG overlays — saliency rectangles, contours, landmarks, skeletons. */
+    .rect-overlay {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .rect-overlay polygon {
+      fill: rgba(99,102,241,0.10);
+      stroke: var(--indigo-600);
+      stroke-width: 0.5;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .contour-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .contour-overlay path {
+      fill: none;
+      stroke: rgba(20,184,166,0.85);
+      stroke-width: 1.2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .lm-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .lm-overlay circle {
+      fill: var(--pink-500);
+      stroke: white;
+      stroke-width: 0.001;
+      vector-effect: non-scaling-stroke;
+    }
+
+    /* Skeleton overlays — bones (lines) + joints (circles). */
+    .skel-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .skel-overlay line {
+      stroke-width: 2.5px;
+      vector-effect: non-scaling-stroke;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.6));
+    }
+    .skel-overlay circle {
+      r: 0.008;
+      stroke: white;
+      stroke-width: 1px;
+      vector-effect: non-scaling-stroke;
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+    }
+    .skel-overlay.body line { stroke: #c084fc; }
+    .skel-overlay.body circle { fill: #a78bfa; }
+    .skel-overlay.hand line { stroke: #f0abfc; }
+    .skel-overlay.hand circle { fill: #f9a8d4; }
+    .skel-overlay.animal line { stroke: #4ade80; }
+    .skel-overlay.animal circle { fill: #86efac; }
+
+    /* Bounding-box rows: tiny image-cropped thumbnail + numeric coordinates. */
+    .bbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 0;
+    }
+    .bbox-thumb {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      border-radius: 6px;
+      border: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .bbox-row > span {
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+    }
+    .lm-region {
+      padding-left: 56px;
+      font-size: 11.5px;
+      color: var(--gray-600);
+    }
+    em.dim { color: var(--gray-500); font-style: normal; }
+    @media (max-width: 600px) {
+      .bbox-thumb { width: 44px; height: 44px; }
+      .lm-region { padding-left: 0; }
+      .bbox-row { font-size: 12px; }
+    }
+
+    /* Horizon overlay — a single tilted line crossing the image centre. */
+    .horizon-overlay {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .horizon-overlay .horizon-line {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 140%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--amber-500) 20%, var(--amber-500) 80%, transparent);
+      box-shadow: 0 0 0 1px rgba(245,158,11,0.25);
+      transform-origin: 50% 50%;
+    }
+
+    /* Feature-print sparkline. */
+    .fp-spark {
+      width: 100%;
+      max-width: 360px;
+      height: 36px;
+      margin-top: 8px;
+    }
+    .fp-spark rect {
+      fill: rgba(99,102,241,0.45);
+    }
+
+    /* Mobile-first tweaks. */
+    @media (max-width: 600px) {
+      .horizon-dial { width: 60px; height: 60px; }
+      .horizon-val { font-size: 18px; }
+      .metric-bar { min-width: 120px; flex: 1 1 100%; }
+      .data-list { font-size: 12px; }
+    }
+
     .section-head .label {
       font-family: var(--font-mono);
       font-size: 12px; font-weight: 700;
@@ -1033,12 +1296,13 @@
     </div>
     <h1 class="hero-title">auge</h1>
     <p class="hero-subtitle">Apple Vision from your terminal.</p>
-    <p class="hero-subtext">Point auge at any image. Get OCR text, classification labels, barcode payloads, and face bounding boxes back. One command, every analysis. The Vision framework is already on your Mac - auge gives you a UNIX CLI to it.</p>
+    <p class="hero-subtext">Point auge at any image. Get OCR, classification, barcodes, faces &amp; landmarks, body / hand / animal pose, document parsing, aesthetics scoring, smudge detection, saliency, contours, embeddings &mdash; <strong>22 capabilities</strong>, structured JSON, one command. The Vision framework is already on your Mac. auge gives you a UNIX CLI to all of it.</p>
     <div class="hero-pills">
       <span class="hero-pill"><span class="pill-dot" style="background:#4ADE80"></span> 100% on-device</span>
       <span class="hero-pill"><span class="pill-dot" style="background:#FBBF24"></span> No API keys</span>
       <span class="hero-pill"><span class="pill-dot" style="background:#60A5FA"></span> Zero dependencies</span>
       <span class="hero-pill"><span class="pill-dot" style="background:#F472B6"></span> Pipe-friendly</span>
+      <span class="hero-pill"><span class="pill-dot" style="background:#A78BFA"></span> macOS 26 / Tahoe</span>
     </div>
     <div class="hero-install">
       <code><span class="prompt">$</span>brew install Arthur-Ficial/tap/auge</code>
@@ -1048,7 +1312,7 @@
       </button>
     </div>
     <p class="hero-repo">Source: <a href="https://github.com/Arthur-Ficial/auge" target="_blank" rel="noopener">github.com/Arthur-Ficial/auge</a></p>
-    <p class="hero-req">Requires: macOS 10.15+ &middot; Apple Silicon or Intel &middot; No Xcode needed</p>
+    <p class="hero-req">Requires: macOS 26 (Tahoe) &middot; Apple Silicon &middot; No Xcode needed</p>
   </div>
 </section>
 
@@ -1066,7 +1330,7 @@
     <div class="section-header">
       <span class="eyebrow">Watch it work</span>
       <h2>One image in. Everything out.</h2>
-      <p>The default mode is <code>--all</code>: OCR + classify + barcodes + faces, in one pass, on-device. Other tools make you pick. auge gives you everything.</p>
+      <p><code>--all</code> in a single pass — OCR + classify + barcodes + faces. Plus 18 more flags for documents, body / hand / animal pose, face landmarks, aesthetics, lens-smudge, saliency, rectangles, horizon, contours, embeddings. Every card below shows the v1.3 <strong>Deep analysis</strong> tile — same image, expanded view.</p>
     </div>
     <div class="term">
       <div class="term-chrome">

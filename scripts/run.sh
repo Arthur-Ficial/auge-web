@@ -45,7 +45,13 @@ for i in $(seq 0 $((count - 1))); do
         "$AUGE" "${args[@]}" "$file" > "$txt_out" 2>> "$err_out" || true
         # Compact NDJSON variant for the showcase footer
         "$AUGE" "${args[@]}" --ndjson "$file" > "$DEST/$id.ndjson" 2>> "$err_out" || true
-        echo "OK"
+
+        # v1.3 enrichment passes — every item gets these extra analyses.
+        # Empty / null results are fine; templates render conditionally.
+        for cap in aesthetics smudge saliency-attention saliency-objectness rectangles horizon face-landmarks animals body-pose hand-pose animal-pose contours text-rectangles feature-print; do
+            "$AUGE" "--$cap" -o json "$file" > "$DEST/$id.$cap.json" 2>> "$err_out" || true
+        done
+        echo "OK + v1.3"
     else
         echo "ERROR — see $err_out"
     fi
