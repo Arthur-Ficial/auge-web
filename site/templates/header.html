@@ -858,6 +858,67 @@
       color: var(--gray-500);
       margin-top: 4px;
     }
+    /* Horizon: corrected (counter-rotated) preview so the tilt is visually
+       neutralised. The frame clips the over-rotation so the image still
+       fits its row. A thin red line marks true horizontal. */
+    .horizon-correct {
+      margin-top: 14px;
+    }
+    .horizon-correct-frame {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+    .horizon-correct-img {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 130%; height: 130%;
+      object-fit: cover;
+      transform-origin: center center;
+      translate: -50% -50%;
+    }
+    .horizon-correct-line {
+      position: absolute;
+      top: 50%; left: 6%; right: 6%;
+      height: 0;
+      border-top: 2px dashed rgba(220,38,38,0.85);
+      box-shadow: 0 0 0 1px rgba(220,38,38,0.18);
+      pointer-events: none;
+    }
+    .horizon-correct-cap {
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--gray-500);
+    }
+
+    /* Pose section thumbs: full coordinate listing with one chip per joint. */
+    .pose-row .pose-thumb { background: var(--gray-50); }
+    .lm-pt {
+      display: inline-flex;
+      align-items: baseline;
+      padding: 2px 6px;
+      margin: 2px 4px 2px 0;
+      border-radius: 4px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gray-700);
+      white-space: nowrap;
+    }
+    .lm-pt code {
+      background: transparent;
+      padding: 0;
+      color: var(--indigo-700);
+      font-size: 11px;
+      margin-right: 4px;
+    }
 
     /* Saliency / animals overlays (boxes on image). */
     .saliency-overlay { position: absolute; inset: 0; pointer-events: none; }
@@ -982,10 +1043,38 @@
       align-self: center;
     }
     .lm-region {
+      font-size: 12px;
+      color: var(--gray-700);
+      padding: 4px 0 4px 6px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px;
+      line-height: 1.5;
+    }
+    .lm-region strong { color: var(--gray-900); font-weight: 700; }
+    .lm-swatch {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 1px solid white;
+      box-shadow: 0 0 0 1px var(--gray-300);
+      flex-shrink: 0;
+    }
+    .lm-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gray-500);
+    }
+    .lm-coords {
+      flex: 1 1 100%;
+      padding-left: 18px;
+      font-family: var(--font-mono);
       font-size: 11.5px;
       color: var(--gray-600);
-      padding-left: 6px;
+      word-break: break-word;
     }
+    .landmark-thumb image { /* The face crop dimms slightly behind the dots. */ }
     em.dim { color: var(--gray-500); font-style: normal; }
 
     /* Per-card JSON link list: each cap → its raw output file. */

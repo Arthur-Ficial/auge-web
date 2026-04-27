@@ -452,6 +452,7 @@ EOF
 
 render_horizon_section() {
   local id="$1"
+  local image_file="$2"
   local f="$DATA/$id.horizon.json"
   if [ ! -f "$f" ]; then
     cat <<EOF
@@ -479,6 +480,9 @@ EOF
   if awk "BEGIN { exit !($abs_deg < 1) }"; then verdict="level"; v_class="ok"
   elif awk "BEGIN { exit !($abs_deg < 5) }"; then verdict="slight tilt"; v_class="warn"
   else verdict="tilted"; v_class="bad"; fi
+  # Counter-rotation to LEVEL the image: rotate by -deg.
+  local correct_deg
+  correct_deg=$(awk "BEGIN{printf \"%.4f\", -1 * $deg}")
   cat <<EOF
 <div class="section-block">
   <div class="section-head"><span class="icon horizon">⏤</span><span class="label">Horizon</span><span class="stats">$(printf '%.2f°' "$deg")</span></div>
@@ -486,8 +490,15 @@ EOF
     <div class="horizon-dial"><div class="horizon-needle" style="transform: rotate(${deg}deg)"></div></div>
     <div>
       <div class="horizon-val">$(printf '%.2f°' "$deg") <span class="metric-tag ${v_class}">${verdict}</span></div>
-      <div class="horizon-meta">$(printf '%.4f' "$rad") rad · drawn on image as overlay</div>
+      <div class="horizon-meta">$(printf '%.4f' "$rad") rad · red line drawn on image above · the small preview is rotated by $(printf '%.2f°' "$correct_deg") to make the horizon level.</div>
     </div>
+  </div>
+  <div class="horizon-correct">
+    <div class="horizon-correct-frame">
+      <img src="images/${image_file}" class="horizon-correct-img" style="transform: rotate(${correct_deg}deg);" alt="rotated to level horizon">
+      <div class="horizon-correct-line"></div>
+    </div>
+    <div class="horizon-correct-cap">corrected (rotated by $(printf '%.2f°' "$correct_deg")) — the red dotted line is true horizontal.</div>
   </div>
 </div>
 EOF
@@ -523,32 +534,7 @@ EOF
   <div class="landmarks-summary">Per-face roll / yaw / pitch (head pose) and ~76 anchor points (eyes, brows, nose, lips, jawline, pupils). Points drawn on the image above.</div>
   <div class="data-list">
 EOF
-  jq -c '.results.faces[]' "$f" | nl -w1 -ba | while read -r idx face; do
-    local x y w h roll yaw pitch thumb
-    x=$(echo "$face" | jq -r '.x');     y=$(echo "$face" | jq -r '.y')
-    w=$(echo "$face" | jq -r '.width'); h=$(echo "$face" | jq -r '.height')
-    roll=$(echo "$face"  | jq -r '.roll  // empty')
-    yaw=$(echo "$face"   | jq -r '.yaw   // empty')
-    pitch=$(echo "$face" | jq -r '.pitch // empty')
-    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$x" "$y" "$w" "$h")
-
-    local pose_html
-    if [ -n "$roll" ] && [ "$roll" != "null" ] && [ -n "$yaw" ] && [ -n "$pitch" ]; then
-      local r_deg y_deg p_deg
-      r_deg=$(awk "BEGIN { printf \"%.2f\", $roll * 180 / 3.141592653589793 }")
-      y_deg=$(awk "BEGIN { printf \"%.2f\", $yaw  * 180 / 3.141592653589793 }")
-      p_deg=$(awk "BEGIN { printf \"%.2f\", $pitch * 180 / 3.141592653589793 }")
-      pose_html="roll <strong>${r_deg}°</strong> · yaw <strong>${y_deg}°</strong> · pitch <strong>${p_deg}°</strong>"
-    else
-      pose_html='<em class="dim">pose not reported</em>'
-    fi
-
-    printf '    <div class="bbox-row">%s<span>face %s — bbox=(%.3f, %.3f, %.3f, %.3f) — %s</span></div>\n' \
-      "$thumb" "$idx" "$x" "$y" "$w" "$h" "$pose_html"
-
-    # Then enumerate every landmark region: name + actual point count.
-    echo "$face" | jq -r '.landmarks | to_entries[] | "      <div class=\"lm-region\">  · \(.key): <strong>\(.value | length)</strong> points</div>"'
-  done
+  python3 "$ROOT/scripts/_face_landmarks.py" "$f" "images/$image_file" "$IMG_W" "$IMG_H"
   cat <<EOF
   </div>
 </div>
@@ -630,27 +616,10 @@ EOF
   cat <<EOF
 <div class="section-block">
   <div class="section-head"><span class="icon pose-body">⩎</span><span class="label">Body pose</span><span class="stats">${count} bod$([ "$count" -ne 1 ] && echo ies || echo y)</span></div>
-  <div class="landmarks-summary">19 named joints per body — head, ears, eyes, neck, shoulders, elbows, wrists, root, hips, knees, ankles. Skeleton drawn on the image above.</div>
+  <div class="landmarks-summary">19 named joints per body — head, ears, eyes, neck, shoulders, elbows, wrists, root, hips, knees, ankles. Skeleton drawn on the image above; per-body skeleton + every joint name and (x, y, confidence) below.</div>
   <div class="data-list">
 EOF
-  jq -c '.results.bodies[]' "$f" | nl -w1 -ba | while read -r idx body; do
-    local jcount avg minx miny maxx maxy bw bh thumb
-    jcount=$(echo "$body" | jq -r '.joints | length')
-    avg=$(echo "$body" | jq -r '[.joints[].confidence] | add / length')
-    # Bounding box of all detected joints (Vision-style, bottom-origin).
-    read -r minx maxx miny maxy <<< "$(echo "$body" | jq -r '
-      [.joints[] | select(.confidence > 0.05)] as $J |
-      "\($J | min_by(.x).x) \($J | max_by(.x).x) \($J | min_by(.y).y) \($J | max_by(.y).y)"')"
-    if [ -n "$minx" ] && [ "$minx" != "null" ]; then
-      bw=$(awk "BEGIN{print $maxx - $minx}")
-      bh=$(awk "BEGIN{print $maxy - $miny}")
-      thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
-    else
-      thumb=""
-    fi
-    printf '    <div class="bbox-row">%s<span>body %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong> — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
-      "$thumb" "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
-  done
+  python3 "$ROOT/scripts/_pose_render.py" "$f" body "images/$image_file" "$IMG_W" "$IMG_H"
   cat <<EOF
   </div>
 </div>
@@ -684,27 +653,10 @@ EOF
   cat <<EOF
 <div class="section-block">
   <div class="section-head"><span class="icon pose-hand">✋</span><span class="label">Hand pose</span><span class="stats">${count} hand$([ "$count" -ne 1 ] && echo s)</span></div>
-  <div class="landmarks-summary">21 keypoints per hand (wrist + 4 per finger). Chirality (left / right / unknown) reported per hand. Skeleton drawn on the image above.</div>
+  <div class="landmarks-summary">21 keypoints per hand (wrist + 4 per finger × 5 fingers). Chirality reported per hand. Per-hand skeleton + every joint with full (x, y, confidence) below.</div>
   <div class="data-list">
 EOF
-  jq -c '.results.hands[]' "$f" | nl -w1 -ba | while read -r idx hand; do
-    local chirality jcount avg minx maxx miny maxy bw bh thumb
-    chirality=$(echo "$hand" | jq -r '.chirality')
-    jcount=$(echo "$hand"    | jq -r '.joints | length')
-    avg=$(echo "$hand"       | jq -r '[.joints[].confidence] | add / length')
-    read -r minx maxx miny maxy <<< "$(echo "$hand" | jq -r '
-      [.joints[] | select(.confidence > 0.05)] as $J |
-      "\($J | min_by(.x).x) \($J | max_by(.x).x) \($J | min_by(.y).y) \($J | max_by(.y).y)"')"
-    if [ -n "$minx" ] && [ "$minx" != "null" ]; then
-      bw=$(awk "BEGIN{print $maxx - $minx}")
-      bh=$(awk "BEGIN{print $maxy - $miny}")
-      thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
-    else
-      thumb=""
-    fi
-    printf '    <div class="bbox-row">%s<span>hand %s — <strong>%s</strong> — %s joints — avg confidence <strong>%.1f%%</strong> — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
-      "$thumb" "$idx" "$chirality" "$jcount" "$(awk "BEGIN{print $avg*100}")" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
-  done
+  python3 "$ROOT/scripts/_pose_render.py" "$f" hand "images/$image_file" "$IMG_W" "$IMG_H"
   cat <<EOF
   </div>
 </div>
@@ -738,26 +690,10 @@ EOF
   cat <<EOF
 <div class="section-block">
   <div class="section-head"><span class="icon pose-animal">🐾</span><span class="label">Animal pose</span><span class="stats">${count} animal$([ "$count" -ne 1 ] && echo s)</span></div>
-  <div class="landmarks-summary">Up to 25 named joints (ears, eyes, neck, shoulders, elbows, knees, paws, tail). Skeleton drawn on the image above.</div>
+  <div class="landmarks-summary">Up to 25 named joints (ears, eyes, nose, neck, elbows, knees, paws, tail). Per-animal skeleton + every joint with full (x, y, confidence) below.</div>
   <div class="data-list">
 EOF
-  jq -c '.results.animals[]' "$f" | nl -w1 -ba | while read -r idx an; do
-    local jcount avg minx maxx miny maxy bw bh thumb
-    jcount=$(echo "$an" | jq -r '.joints | length')
-    avg=$(echo "$an"    | jq -r '[.joints[].confidence] | add / length')
-    read -r minx maxx miny maxy <<< "$(echo "$an" | jq -r '
-      [.joints[] | select(.confidence > 0.05)] as $J |
-      "\($J | min_by(.x).x) \($J | max_by(.x).x) \($J | min_by(.y).y) \($J | max_by(.y).y)"')"
-    if [ -n "$minx" ] && [ "$minx" != "null" ]; then
-      bw=$(awk "BEGIN{print $maxx - $minx}")
-      bh=$(awk "BEGIN{print $maxy - $miny}")
-      thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
-    else
-      thumb=""
-    fi
-    printf '    <div class="bbox-row">%s<span>animal %s — <strong>%s</strong> joints — avg confidence <strong>%.1f%%</strong> — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
-      "$thumb" "$idx" "$jcount" "$(awk "BEGIN{print $avg*100}")" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
-  done
+  python3 "$ROOT/scripts/_pose_render.py" "$f" animal "images/$image_file" "$IMG_W" "$IMG_H"
   cat <<EOF
   </div>
 </div>
@@ -787,26 +723,7 @@ EOF
   <div class="landmarks-summary">Vector edge contours of detected shapes. ${sample} path$([ "$sample" -ne 1 ] && echo s) drawn on the image above (sampled from top-level).</div>
   <div class="data-list">
 EOF
-  if [ "$sample" -gt 0 ]; then
-    jq -c '.results.contours.paths[]' "$f" | nl -w1 -ba | while read -r idx p; do
-      local pc minx maxx miny maxy bw bh thumb
-      pc=$(echo "$p" | jq -r '.pointCount')
-      read -r minx maxx miny maxy <<< "$(echo "$p" | jq -r '
-        [.points[]] as $P |
-        "\($P | min_by(.x).x) \($P | max_by(.x).x) \($P | min_by(.y).y) \($P | max_by(.y).y)"')"
-      if [ -n "$minx" ] && [ "$minx" != "null" ]; then
-        bw=$(awk "BEGIN{print $maxx - $minx}")
-        bh=$(awk "BEGIN{print $maxy - $miny}")
-        thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$minx" "$miny" "$bw" "$bh")
-      else
-        thumb=""
-      fi
-      printf '    <div class="bbox-row">%s<span>path %s — <strong>%s</strong> points — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
-        "$thumb" "$idx" "$pc" "${minx:-0}" "${miny:-0}" "${bw:-0}" "${bh:-0}"
-    done
-  else
-    echo '    <div class="empty-msg">No top-level contours.</div>'
-  fi
+  python3 "$ROOT/scripts/_contours_render.py" "$f" "images/$image_file" "$IMG_W" "$IMG_H"
   cat <<EOF
   </div>
 </div>
@@ -1322,7 +1239,7 @@ $(render_saliency_section "$id" "attention" "saliency-attention" "$display_filen
 $(render_saliency_section "$id" "objectness" "saliency-objectness" "$display_filename")
 $(render_rectangles_section "$id" "$display_filename")
 $(render_text_rectangles_section "$id" "$display_filename")
-$(render_horizon_section "$id")
+$(render_horizon_section "$id" "$display_filename")
 $(render_contours_section "$id" "$display_filename")
 $(render_feature_print_section "$id")
     <div class="section-block">
