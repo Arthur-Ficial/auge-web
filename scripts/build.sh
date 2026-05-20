@@ -19,6 +19,9 @@ IMAGES="$SITE/images"
 mkdir -p "$IMAGES"
 
 VERSION=$(auge --version 2>/dev/null | awk '{print $2}' | sed 's/^v//' || echo "—")
+# Build identifier — combined into asset URLs (e.g. ?v=BUILD_ID) so each
+# deploy invalidates browser caches automatically. Format: <auge-version>-<unix-epoch>.
+BUILD_ID="${VERSION}-$(date +%s)"
 GENERATED=$(date "+%Y-%m-%d")
 
 # Pull test count from auge repo if present
@@ -730,6 +733,150 @@ EOF
 EOF
 }
 
+render_subject_section() {
+  local id="$1"
+  local image_file="$2"
+  local f="$DATA/$id.subject.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon subject">⬚</span><span class="label">Subject lift</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNGenerateForegroundInstanceMaskRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count cov pct
+  count=$(jq -r '.results.subject.count // 0' "$f")
+  cov=$(jq -r   '.results.subject.coverage // 0' "$f")
+  pct=$(awk "BEGIN { printf \"%.1f\", $cov * 100 }")
+  if [ "$count" = "0" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon subject">⬚</span><span class="label">Subject lift</span><span class="stats">0 lifted</span></div>
+  <div class="empty-msg">No foreground subjects detected. (Image is mostly background or texture.)</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon subject">⬚</span><span class="label">Subject lift</span><span class="stats">${count} subject$([ "$count" -ne 1 ] && echo s) · ${pct}%</span></div>
+  <div class="landmarks-summary">Per-instance foreground mask: each lifted subject as bounding box + area %. Boxes drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.subject.instances[]' "$f" | while IFS= read -r row; do
+    local idx area x y w h thumb
+    idx=$(echo "$row" | jq -r '.index')
+    area=$(echo "$row" | jq -r '.area')
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$x" "$y" "$w" "$h")
+    printf '    <div class="bbox-row">%s<span>subject %s — <strong>%.1f%%</strong> of image — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$(awk "BEGIN{print $area*100}")" "$x" "$y" "$w" "$h"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_persons_mask_section() {
+  local id="$1"
+  local image_file="$2"
+  local f="$DATA/$id.persons-mask.json"
+  if [ ! -f "$f" ]; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon personsmask">☺</span><span class="label">Persons mask</span><span class="stats">no result</span></div>
+  <div class="empty-msg">VNGeneratePersonSegmentationRequest returned nothing.</div>
+</div>
+EOF
+    return
+  fi
+  local count cov pct
+  count=$(jq -r '.results.persons_mask.count // 0' "$f")
+  cov=$(jq -r   '.results.persons_mask.coverage // 0' "$f")
+  pct=$(awk "BEGIN { printf \"%.1f\", $cov * 100 }")
+  if awk "BEGIN { exit !($cov < 0.001) }"; then
+    cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon personsmask">☺</span><span class="label">Persons mask</span><span class="stats">0% person pixels</span></div>
+  <div class="empty-msg">No people segmented in this image.</div>
+</div>
+EOF
+    return
+  fi
+  cat <<EOF
+<div class="section-block">
+  <div class="section-head"><span class="icon personsmask">☺</span><span class="label">Persons mask</span><span class="stats">${pct}% · ${count} region$([ "$count" -ne 1 ] && echo s)</span></div>
+  <div class="landmarks-summary">Semantic person segmentation: coverage % of the frame + connected-component regions (each separate person blob). Boxes drawn on the image above.</div>
+  <div class="data-list">
+EOF
+  jq -c '.results.persons_mask.instances[]' "$f" | while IFS= read -r row; do
+    local idx area x y w h thumb
+    idx=$(echo "$row" | jq -r '.index')
+    area=$(echo "$row" | jq -r '.area')
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    thumb=$(bbox_thumb "$image_file" "$IMG_W" "$IMG_H" "$x" "$y" "$w" "$h")
+    printf '    <div class="bbox-row">%s<span>region %s — <strong>%.1f%%</strong> of image — bbox=(%.3f, %.3f, %.3f, %.3f)</span></div>\n' \
+      "$thumb" "$idx" "$(awk "BEGIN{print $area*100}")" "$x" "$y" "$w" "$h"
+  done
+  cat <<EOF
+  </div>
+</div>
+EOF
+}
+
+render_subject_overlay() {
+  local id="$1"
+  local f="$DATA/$id.subject.json"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r '.results.subject.count // 0' "$f")
+  [ "$count" = "0" ] && return
+  echo '<div class="subject-overlay">'
+  jq -c '.results.subject.instances[]' "$f" | while IFS= read -r row; do
+    local x y w h idx area left top width height
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    idx=$(echo "$row" | jq -r '.index')
+    area=$(echo "$row" | jq -r '.area')
+    left=$(awk "BEGIN { printf \"%.2f\", $x * 100 }")
+    top=$(awk "BEGIN { printf \"%.2f\", (1 - $y - $h) * 100 }")
+    width=$(awk "BEGIN { printf \"%.2f\", $w * 100 }")
+    height=$(awk "BEGIN { printf \"%.2f\", $h * 100 }")
+    printf '<div class="subject-box" style="left:%s%%;top:%s%%;width:%s%%;height:%s%%"><div class="label">subject %s · %.0f%%</div></div>\n' \
+      "$left" "$top" "$width" "$height" "$idx" "$(awk "BEGIN{print $area*100}")"
+  done
+  echo '</div>'
+}
+
+render_persons_mask_overlay() {
+  local id="$1"
+  local f="$DATA/$id.persons-mask.json"
+  [ -f "$f" ] || return
+  local count
+  count=$(jq -r '.results.persons_mask.count // 0' "$f")
+  [ "$count" = "0" ] && return
+  echo '<div class="personsmask-overlay">'
+  jq -c '.results.persons_mask.instances[]' "$f" | while IFS= read -r row; do
+    local x y w h idx area left top width height
+    x=$(echo "$row" | jq -r '.x'); y=$(echo "$row" | jq -r '.y')
+    w=$(echo "$row" | jq -r '.width'); h=$(echo "$row" | jq -r '.height')
+    idx=$(echo "$row" | jq -r '.index')
+    area=$(echo "$row" | jq -r '.area')
+    left=$(awk "BEGIN { printf \"%.2f\", $x * 100 }")
+    top=$(awk "BEGIN { printf \"%.2f\", (1 - $y - $h) * 100 }")
+    width=$(awk "BEGIN { printf \"%.2f\", $w * 100 }")
+    height=$(awk "BEGIN { printf \"%.2f\", $h * 100 }")
+    printf '<div class="personsmask-box" style="left:%s%%;top:%s%%;width:%s%%;height:%s%%"><div class="label">person %s · %.0f%%</div></div>\n' \
+      "$left" "$top" "$width" "$height" "$idx" "$(awk "BEGIN{print $area*100}")"
+  done
+  echo '</div>'
+}
+
 render_text_rectangles_section() {
   local id="$1"
   local image_file="$2"
@@ -1201,10 +1348,12 @@ build_card() {
 <article class="card" id="$id">
   <div class="card-image">
     <div class="card-image-frame">
-      <img src="images/$(echo "$display_filename" | html_escape)" alt="$title_e" loading="lazy">
+      <img src="images/$(echo "$display_filename" | html_escape)" alt="$title_e" loading="lazy" decoding="async" width="$IMG_W" height="$IMG_H">
 $(render_horizon_overlay "$id")
 $(render_contours_overlay "$id")
 $(render_text_rectangles_overlay "$id")
+$(render_subject_overlay "$id")
+$(render_persons_mask_overlay "$id")
 $(render_rectangles_overlay "$id")
 $(render_saliency_overlay "$id")
 $(render_animals_overlay "$id")
@@ -1241,6 +1390,8 @@ $(render_rectangles_section "$id" "$display_filename")
 $(render_text_rectangles_section "$id" "$display_filename")
 $(render_horizon_section "$id" "$display_filename")
 $(render_contours_section "$id" "$display_filename")
+$(render_subject_section "$id" "$display_filename")
+$(render_persons_mask_section "$id" "$display_filename")
 $(render_feature_print_section "$id")
     <div class="section-block">
       <div class="section-head">
@@ -1274,13 +1425,53 @@ for i in $(seq 0 $((count - 1))); do
     build_card "$i" >> "$TMP_BODY"
 done
 
-# Concatenate header + cards + footer, then substitute placeholders
+# Generate the per-category table-of-contents linking to each card.
+TMP_TOC=$(mktemp)
+python3 - "$MANIFEST" > "$TMP_TOC" <<'PYEOF'
+import json, sys, html
+items = json.load(open(sys.argv[1]))['items']
+CAT_LABEL = {
+    'faces': 'Faces & people',
+    'classify': 'Classification & objects',
+    'barcode': 'Barcodes & QR',
+    'multilingual': 'OCR & languages',
+    'historical': 'Historical documents',
+    'animals': 'Animals & wildlife',
+}
+ORDER = ['faces', 'classify', 'barcode', 'multilingual', 'historical', 'animals']
+groups = {c: [] for c in ORDER}
+for it in items:
+    groups.setdefault(it.get('category', 'other'), []).append(it)
+print('<nav class="corpus-toc" aria-label="Showcase examples">')
+print('  <h3 class="corpus-toc-title">Jump to an example</h3>')
+print('  <div class="corpus-toc-grid">')
+for cat in ORDER:
+    if not groups.get(cat): continue
+    label = CAT_LABEL.get(cat, cat.title())
+    print(f'    <div class="corpus-toc-group">')
+    print(f'      <h4>{html.escape(label)} <span>({len(groups[cat])})</span></h4>')
+    print('      <ul>')
+    for it in groups[cat]:
+        title = html.escape(it['title'])
+        yr = it.get('year', '')
+        yr_s = f' <span class="yr">{yr}</span>' if yr else ''
+        print(f'        <li><a href="#{html.escape(it["id"])}">{title}</a>{yr_s}</li>')
+    print('      </ul>')
+    print('    </div>')
+print('  </div>')
+print('</nav>')
+PYEOF
+trap 'rm -f "$TMP_BODY" "$TMP_TOC"' EXIT
+
+# Concatenate header + TOC + cards + footer, then substitute placeholders
 {
   cat "$TPL/header.html"
+  cat "$TMP_TOC"
   cat "$TMP_BODY"
   cat "$TPL/footer.html"
 } | sed \
     -e "s|__VERSION__|$VERSION|g" \
+    -e "s|__BUILD_ID__|$BUILD_ID|g" \
     -e "s|__TEST_COUNT__|$TEST_COUNT|g" \
     -e "s|__GENERATED__|$GENERATED|g" \
     -e "s|__CORPUS_TOTAL__|$CORPUS_TOTAL|g" \

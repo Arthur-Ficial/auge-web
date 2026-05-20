@@ -48,7 +48,7 @@ for i in $(seq 0 $((count - 1))); do
 
         # v1.3 enrichment passes — every item gets these extra analyses.
         # Empty / null results are fine; templates render conditionally.
-        for cap in aesthetics smudge saliency-attention saliency-objectness rectangles horizon face-landmarks animals body-pose hand-pose animal-pose contours text-rectangles feature-print; do
+        for cap in aesthetics smudge saliency-attention saliency-objectness rectangles horizon face-landmarks animals body-pose hand-pose animal-pose contours text-rectangles feature-print subject persons-mask; do
             "$AUGE" "--$cap" -o json "$file" > "$DEST/$id.$cap.json" 2>> "$err_out" || true
         done
         echo "OK + v1.3"
