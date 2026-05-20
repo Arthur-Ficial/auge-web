@@ -568,20 +568,6 @@
       ]
     },
     {
-      "id": "qr-outdoor-conwy",
-      "title": "QR code on Conwy street info sign (UK, outdoor)",
-      "year": 2012,
-      "category": "barcode",
-      "license": "CC BY-SA 2.0 (Geograph)",
-      "source": "https://commons.wikimedia.org/wiki/File:HiPoints_information_QR_code_on_Lower_Gate_Street,_Conwy_-_geograph.org.uk_-_3126912.jpg",
-      "wiki_file": "HiPoints_information_QR_code_on_Lower_Gate_Street,_Conwy_-_geograph.org.uk_-_3126912.jpg",
-      "filename": "qr-outdoor-conwy.jpg",
-      "blurb": "A real-world outdoor QR code on a tourist information sign in Conwy, Wales. auge decodes the URL plus picks up the surrounding sign text.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
       "id": "colosseum",
       "title": "Colosseum, Rome",
       "year": 2007,
@@ -964,34 +950,6 @@
       ]
     },
     {
-      "id": "red-panda",
-      "title": "Red Panda",
-      "year": 2016,
-      "category": "animals",
-      "license": "CC-BY (Wikimedia Commons)",
-      "source": "https://commons.wikimedia.org/wiki/File:Red_Panda_(24986761703).jpg",
-      "wiki_file": "Red_Panda_(24986761703).jpg",
-      "filename": "red-panda.jpg",
-      "blurb": "Endangered, native to the eastern Himalayas. Despite the name, not closely related to the giant panda - red pandas are their own family. Mostly bamboo, occasionally insects.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
-      "id": "cute-kitten",
-      "title": "Cute grey kitten",
-      "year": 2014,
-      "category": "animals",
-      "license": "CC-BY-SA",
-      "source": "https://commons.wikimedia.org/wiki/File:Cute_grey_kitten.jpg",
-      "wiki_file": "Cute_grey_kitten.jpg",
-      "filename": "cute-kitten.jpg",
-      "blurb": "A baseline test of Apple Vision's animal classifier on what may be the most common photo subject on the open internet.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
       "id": "adelie-penguins",
       "title": "Adelie Penguins on iceberg",
       "year": 2010,
@@ -1001,48 +959,6 @@
       "wiki_file": "Adelie_Penguins_on_iceberg.jpg",
       "filename": "adelie-penguins.jpg",
       "blurb": "A line of Adelie penguins on a tabular iceberg in the Ross Sea. They breed only on the Antarctic continent. Climate-change canary species.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
-      "id": "galapagos-tortoise",
-      "title": "Galapagos giant tortoise",
-      "year": 2007,
-      "category": "animals",
-      "license": "CC-BY",
-      "source": "https://commons.wikimedia.org/wiki/File:Galapagos_giant_tortoise_Geochelone_elephantopus.jpg",
-      "wiki_file": "Galapagos_giant_tortoise_Geochelone_elephantopus.jpg",
-      "filename": "galapagos-tortoise.jpg",
-      "blurb": "A Galapagos giant tortoise. Darwin spent five weeks on the islands in 1835 - the variation in tortoise shells across islands seeded On the Origin of Species. They live up to 170 years.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
-      "id": "atlantic-puffin",
-      "title": "Atlantic Puffin",
-      "year": 2010,
-      "category": "animals",
-      "license": "CC-BY-SA",
-      "source": "https://commons.wikimedia.org/wiki/File:Puffin_(2).jpg",
-      "wiki_file": "Puffin_(2).jpg",
-      "filename": "puffin.jpg",
-      "blurb": "An Atlantic puffin in breeding plumage - the colourful beak is shed in winter. They mate for life and can hold a dozen fish crosswise in their bill before swallowing.",
-      "auge_args": [
-        "--all"
-      ]
-    },
-    {
-      "id": "knut-polar-bear",
-      "title": "Knut - Berlin Zoo polar bear cub",
-      "year": 2007,
-      "category": "animals",
-      "license": "CC-BY-SA",
-      "source": "https://commons.wikimedia.org/wiki/File:Knut_IMG_8095.jpg",
-      "wiki_file": "Knut_IMG_8095.jpg",
-      "filename": "knut.jpg",
-      "blurb": "Knut, the polar bear cub born at Berlin Zoo in December 2006 and hand-raised after his mother rejected him. Became a global media phenomenon. Died young, in 2011.",
       "auge_args": [
         "--all"
       ]

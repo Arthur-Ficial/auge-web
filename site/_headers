@@ -1,0 +1,27 @@
+# Cloudflare Pages headers — long-cache static assets, short-cache HTML.
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# Versioned/build-id'd assets are immutable — cache for 1 year.
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.ico
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML is short-lived so deploys propagate fast.
+/*.html
+  Cache-Control: public, max-age=300, s-maxage=300, must-revalidate
+
+# Root document
+/
+  Cache-Control: public, max-age=300, s-maxage=300, must-revalidate
+
+# Security headers (cheap wins).
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
