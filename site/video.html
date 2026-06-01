@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>auge sees video — Apple Vision over video frames, from your terminal</title>
+  <meta name="description" content="auge now samples video frames and runs OCR + classification on each one — 100% on-device. Demonstrated on real public-domain NASA footage. Plus a full v1.8.0 audit changelog.">
+  <meta name="theme-color" content="#4F46E5">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+
+  <meta property="og:title" content="auge sees video — Apple Vision over video frames">
+  <meta property="og:description" content="auge samples video frames and runs OCR + classification per frame, 100% on-device. Shown on real public-domain NASA footage.">
+  <meta property="og:url" content="https://auge.franzai.com/video.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="auge">
+  <meta property="og:image" content="https://auge.franzai.com/videos/nasa-mars2020-rover.jpg">
+  <link rel="canonical" href="https://auge.franzai.com/video.html">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --indigo-400:#818CF8; --indigo-500:#6366F1; --indigo-600:#4F46E5; --indigo-700:#4338CA; --indigo-950:#1E1B4B;
+      --teal-400:#2DD4BF; --amber-500:#F59E0B; --green-600:#16A34A; --pink-500:#EC4899;
+      --white:#FFFFFF; --cream:#FAFAF7;
+      --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB; --gray-300:#D1D5DB;
+      --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-600:#4B5563; --gray-700:#374151; --gray-800:#1F2937; --gray-900:#111827;
+      --term-bg:#0B0B14; --term-surface:#14142B; --term-text:#E2E8F0; --term-prompt:#818CF8; --term-out:#4ADE80; --term-dim:#64748B;
+      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      --shadow-md: 0 4px 12px rgba(15,23,42,0.06);
+      --shadow-lg: 0 12px 32px rgba(15,23,42,0.08);
+      --shadow-xl: 0 24px 64px rgba(15,23,42,0.10);
+    }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { font-family: var(--font-body); color: var(--gray-800); line-height: 1.65; background: var(--white); -webkit-font-smoothing: antialiased; }
+    a { color: var(--indigo-600); text-decoration: none; } a:hover { text-decoration: underline; }
+    img, video { max-width: 100%; height: auto; }
+    code, pre, kbd { font-family: var(--font-mono); font-size: 0.92em; }
+    .container { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    @media (max-width: 640px) { .container { padding: 0 16px; } }
+
+    /* nav */
+    .nav { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,0.85); backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid var(--gray-200); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .brand { font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; color: var(--gray-900); }
+    .brand span { color: var(--indigo-600); }
+    .nav a.back { font-weight: 600; font-size: 0.95rem; }
+
+    /* hero */
+    .hero { background: linear-gradient(180deg, var(--cream) 0%, var(--white) 100%); border-bottom: 1px solid var(--gray-200); padding: 72px 0 56px; }
+    .pill { display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--indigo-700); background: #EEF2FF; border: 1px solid #E0E7FF; padding: 5px 12px; border-radius: 999px; margin-bottom: 18px; }
+    h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05; letter-spacing: -0.03em; color: var(--gray-900); font-weight: 800; }
+    h1 .accent { background: linear-gradient(90deg, var(--indigo-600), var(--pink-500)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lede { margin-top: 18px; font-size: 1.18rem; color: var(--gray-600); max-width: 60ch; }
+
+    section { padding: 56px 0; border-bottom: 1px solid var(--gray-100); }
+    h2 { font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -0.02em; color: var(--gray-900); font-weight: 800; }
+    h2 .num { color: var(--indigo-500); font-variant-numeric: tabular-nums; margin-right: 10px; }
+    .section-sub { color: var(--gray-600); margin-top: 8px; max-width: 70ch; }
+
+    /* demo card */
+    .demo { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; margin-top: 28px; }
+    @media (max-width: 860px) { .demo { grid-template-columns: 1fr; } }
+    .media { border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-lg); border: 1px solid var(--gray-200); background: #000; }
+    .media video { display: block; width: 100%; }
+    .cap { font-size: 0.85rem; color: var(--gray-500); margin-top: 10px; }
+    .cap a { color: var(--gray-600); }
+
+    /* terminal */
+    .term { background: var(--term-bg); border-radius: 14px; box-shadow: var(--shadow-xl); overflow: hidden; border: 1px solid #1f1f3a; }
+    .term-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; background: var(--term-surface); border-bottom: 1px solid #1f1f3a; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; } .r{background:#FF5F57}.y{background:#FEBC2E}.g{background:#28C840}
+    .term-title { margin-left: 8px; color: var(--term-dim); font-size: 0.78rem; font-family: var(--font-mono); }
+    .term pre { margin: 0; padding: 18px 16px; color: var(--term-text); font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+    .term .prompt { color: var(--term-prompt); } .term .cmd { color: #fff; } .term .out { color: var(--term-out); }
+    .term .t { color: var(--amber-500); } .term .lbl { color: var(--teal-400); } .term .dim { color: var(--term-dim); }
+
+    .note { margin-top: 24px; background: var(--gray-50); border: 1px solid var(--gray-200); border-left: 3px solid var(--amber-500); border-radius: 10px; padding: 16px 18px; color: var(--gray-700); font-size: 0.95rem; }
+    .note strong { color: var(--gray-900); }
+
+    .cmds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+    @media (max-width: 760px) { .cmds { grid-template-columns: 1fr; } }
+    .cmd-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px; padding: 18px; box-shadow: var(--shadow-md); }
+    .cmd-card code { display: block; background: var(--gray-900); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; overflow-x: auto; }
+    .cmd-card p { margin-top: 10px; color: var(--gray-600); font-size: 0.92rem; }
+
+    /* changelog */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 28px; }
+    @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+    .group { background: var(--white); border: 1px solid var(--gray-200); border-radius: 14px; padding: 22px 24px; box-shadow: var(--shadow-md); }
+    .group h3 { font-size: 1.05rem; color: var(--gray-900); display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+    .tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 3px 9px; border-radius: 999px; }
+    .tag.video { background:#EEF2FF; color: var(--indigo-700); }
+    .tag.honest { background:#FEF3C7; color:#92400E; }
+    .tag.correct { background:#DCFCE7; color:#166534; }
+    .tag.robust { background:#FCE7F3; color:#9D174D; }
+    .group ul { list-style: none; }
+    .group li { position: relative; padding-left: 24px; margin: 11px 0; color: var(--gray-700); font-size: 0.95rem; }
+    .group li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--green-600); font-weight: 800; }
+    .group li code { background: var(--gray-100); padding: 1px 6px; border-radius: 5px; color: var(--gray-900); }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 28px; }
+    @media (max-width: 700px) { .stats { grid-template-columns: repeat(2,1fr); } }
+    .stat { text-align: center; background: var(--cream); border: 1px solid var(--gray-200); border-radius: 14px; padding: 22px 12px; }
+    .stat .big { font-size: 2.2rem; font-weight: 800; color: var(--indigo-600); letter-spacing: -0.02em; }
+    .stat .small { color: var(--gray-600); font-size: 0.88rem; margin-top: 4px; }
+
+    footer { padding: 48px 0 64px; color: var(--gray-500); font-size: 0.9rem; }
+    footer a { color: var(--gray-600); }
+    .method { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 14px 18px; margin-top: 18px; font-size: 0.9rem; color: var(--gray-600); }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">auge<span>·</span>video</div>
+      <a class="back" href="/">← back to auge</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <span class="pill">new in v1.8.0</span>
+      <h1>auge now <span class="accent">sees video</span></h1>
+      <p class="lede">Point auge at a video file and it samples frames at a fixed interval, then runs Apple's on-device Vision OCR and image classification on each one. No upload, no API key, no network — the same 100%-on-device promise, now over time.</p>
+    </div>
+  </header>
+
+  <!-- LIVE DEMO 1 -->
+  <section>
+    <div class="container">
+      <h2><span class="num">01</span>Reading a NASA timelapse, frame by frame</h2>
+      <p class="section-sub">Real public-domain footage. The output below is the exact, unedited result of running auge over the clip on the left — the same "no mocks" rule as the rest of this site.</p>
+
+      <div class="demo">
+        <div>
+          <div class="media">
+            <video controls preload="metadata" poster="/videos/nasa-mars2020-rover.jpg">
+              <source src="/videos/nasa-mars2020-rover.mp4" type="video/mp4">
+            </video>
+          </div>
+          <p class="cap">NASA/JPL-Caltech — “Building the Mars 2020 Rover” timelapse. Public domain (NASA). <a href="https://commons.wikimedia.org/wiki/File:NASA-BuildingMars2020Rover-TimeLapse-20190712.webm">Source on Wikimedia Commons</a>. Transcoded to H.264 for AVFoundation.</p>
+        </div>
+
+        <div class="term">
+          <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="term-title">auge --video</span></div>
+<pre><span class="prompt">$</span> <span class="cmd">auge --video nasa-mars2020-rover.mp4 --every 4s</span>
+<span class="out">video: 20.02s · 6 sampled frames</span>
+<span class="t">[t=0.00s]</span> ocr: PIT CREW FOR MARS | Mars 2020 Gets Some
+          Wheels | NASA | Jet Propulsion Laboratory |
+          California Institute of Technology
+<span class="t">[t=0.00s]</span> classify: <span class="lbl">structure</span> (30%)
+<span class="t">[t=4.00s]</span> classify: <span class="lbl">people</span> (42%)
+<span class="t">[t=8.00s]</span> ocr: On June 13, engineers at NASA's Jet
+          Propulsion Laboratory installed the suspension
+          system and a set of test wheels on the rover.
+<span class="t">[t=8.00s]</span> classify: <span class="lbl">people</span> (77%)
+<span class="t">[t=12.00s]</span> classify: <span class="lbl">people</span> (76%)
+<span class="t">[t=16.00s]</span> ocr: The wheels will be replaced with flight
+          models after the rover is shipped to Kennedy
+          Space Center in Florida.
+<span class="t">[t=16.00s]</span> classify: <span class="lbl">people</span> (75%)
+<span class="t">[t=20.00s]</span> classify: <span class="lbl">people</span> (57%)</pre>
+        </div>
+      </div>
+
+      <p class="section-sub" style="margin-top:22px">It reads the title card and the body captions verbatim, and notice the classification tracks the content over time: <strong>structure</strong> on the title slate, then <strong>people</strong> (up to 77%) once the engineers are at the bench. Same JSON envelope as every other mode — uniform <code>snake_case</code>, schema <code>2</code>:</p>
+
+      <div class="term" style="margin-top:14px">
+        <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="term-title">auge --video … --json --compact | jq</span></div>
+<pre><span class="prompt">$</span> <span class="cmd">auge --video nasa-mars2020-rover.mp4 --every 8s --json --compact | jq</span>
+{
+  <span class="lbl">"mode"</span>: <span class="out">"video"</span>,
+  <span class="lbl">"metadata"</span>: { <span class="lbl">"on_device"</span>: true, <span class="lbl">"schema"</span>: <span class="out">"2"</span>, <span class="lbl">"version"</span>: <span class="out">"1.8.0"</span> },
+  <span class="lbl">"results"</span>: { <span class="lbl">"video"</span>: {
+    <span class="lbl">"duration_seconds"</span>: 20.02,
+    <span class="lbl">"frame_count"</span>: 3,
+    <span class="lbl">"frames"</span>: [ { <span class="lbl">"time"</span>: 0, <span class="lbl">"ocr"</span>: [<span class="out">"PIT CREW FOR MARS"</span>, …], <span class="lbl">"classifications"</span>: [ … ] }, … ]
+  } }
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO 2 -->
+  <section>
+    <div class="container">
+      <h2><span class="num">02</span>And a JPL animation</h2>
+      <div class="demo">
+        <div>
+          <div class="media">
+            <video controls preload="metadata" poster="/videos/nasa-jpl-pia10149.jpg">
+              <source src="/videos/nasa-jpl-pia10149.mp4" type="video/mp4">
+            </video>
+          </div>
+          <p class="cap">NASA/JPL — PIA10149. Public domain (NASA). <a href="https://commons.wikimedia.org/wiki/File:NASA-JPL_-_PIA10149_(pd).ogv">Source on Wikimedia Commons</a>.</p>
+        </div>
+        <div class="term">
+          <div class="term-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="term-title">auge --classify</span></div>
+<pre><span class="prompt">$</span> <span class="cmd">auge --classify nasa-jpl-pia10149.mp4 --every 5s</span>
+<span class="out">video: 8.00s · 2 sampled frames</span>
+<span class="t">[t=0.00s]</span> classify: <span class="lbl">celestial_body</span>, <span class="lbl">outdoor</span>, <span class="lbl">recreation</span>
+<span class="t">[t=5.00s]</span> classify: <span class="lbl">celestial_body</span>, <span class="lbl">sport</span>
+
+<span class="dim"># --trajectories on a video is honest about its limits:</span>
+<span class="prompt">$</span> <span class="cmd">auge --trajectories nasa-jpl-pia10149.mp4</span>
+<span class="dim">error: [error] --trajectories on video is not yet
+implemented; pass a single image frame</span></pre>
+        </div>
+      </div>
+
+      <div class="cmds">
+        <div class="cmd-card">
+          <code>auge --video clip.mp4 --every 1s</code>
+          <p>OCR <em>and</em> classify every sampled frame.</p>
+        </div>
+        <div class="cmd-card">
+          <code>auge --ocr clip.mp4 --every 2s</code>
+          <p>OCR only — read text as it appears over time.</p>
+        </div>
+        <div class="cmd-card">
+          <code>auge --classify clip.mp4 --every 5s</code>
+          <p>Classify only — what's on screen, frame by frame.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Honest about limits.</strong> auge decodes video through Apple's AVFoundation, which on a stock Mac reads <code>.mp4 / .mov / .m4v / .avi / .mkv</code> but not <code>.webm</code> or <code>.ogv</code> (Wikimedia's native formats) — those need a one-line <code>ffmpeg</code> transcode first. Modes that need spatial context across frames (<code>--trajectories</code>) refuse a video with a clear error rather than returning a fake empty result.
+      </div>
+    </div>
+  </section>
+
+  <!-- CHANGELOG -->
+  <section>
+    <div class="container">
+      <h2><span class="num">03</span>What shipped in v1.8.0 — a full audit</h2>
+      <p class="section-sub">Video sampling rode in on a top-to-bottom audit of auge: a fan-out of reviewers read every source file, cross-checked usage against Apple's Vision docs, and adversarially verified each finding. Every confirmed bug below is fixed, with regression tests, and the suite is green.</p>
+
+      <div class="stats">
+        <div class="stat"><div class="big">30</div><div class="small">source files audited</div></div>
+        <div class="stat"><div class="big">26</div><div class="small">fixes shipped</div></div>
+        <div class="stat"><div class="big">308</div><div class="small">unit tests passing</div></div>
+        <div class="stat"><div class="big">0</div><div class="small">network calls (still)</div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="group">
+          <h3><span class="tag video">Video</span> a feature that was dead on arrival</h3>
+          <ul>
+            <li><code>--video</code>, <code>--ocr&nbsp;&lt;video&gt;</code> and <code>--classify&nbsp;&lt;video&gt;</code> now work — path validation silently rejected <em>every</em> video extension, so the whole feature was unreachable.</li>
+            <li><code>--trajectories</code> on a video failed loudly instead of returning a fabricated empty result.</li>
+            <li>Help text documented a video command that never worked; now it documents the real ones.</li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3><span class="tag correct">Correctness</span> results that were quietly wrong</h3>
+          <ul>
+            <li><code>--top N</code> above 10 was capped at 10, and <code>--min-confidence</code> below 0.01 did nothing — classify now returns the full ranked list and honours both flags.</li>
+            <li>Float16 Core ML outputs were emitted as all-zeros; now decoded for real.</li>
+            <li>Face-landmark points were face-box-relative but labelled like image coords — now mapped into the same image space as every other point.</li>
+            <li>Feature-print buffer reads are bounds-checked; optical-flow sampling stride fixed.</li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3><span class="tag honest">Honesty</span> the site's first rule, applied inward</h3>
+          <ul>
+            <li><code>auge --all</code> plain/markdown output now renders all 23 capabilities — it was showing only 4 (the rest hid in the JSON).</li>
+            <li>README and badges corrected to the real <strong>macOS 26 (Tahoe)</strong> baseline (they claimed 10.15+).</li>
+            <li>JSON keys unified to <code>snake_case</code> (schema <code>2</code>); a failed encode now errors loudly instead of printing <code>{}</code>.</li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3><span class="tag robust">Robustness</span> edges that could bite</h3>
+          <ul>
+            <li>Compiled Core ML temp models are cleaned up; oversized PDF pages are capped before rasterizing.</li>
+            <li>Directories, symlinked dirs, and non-finite <code>--every</code> values are rejected up front.</li>
+            <li>Mask-coverage guards a mismatched buffer; document text now includes lists and tables, not just paragraphs.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="method">
+        <strong>Method.</strong> The audit ran as a multi-agent workflow — parallel reviewers per file cluster plus three research tracks (Apple Vision API correctness, OpenAI-pipeline fit, golden-goal/honesty compliance) — with every finding adversarially re-verified against the source before it was accepted. Fixes preserve the project's non-negotiables: 100% on-device, zero dependencies, Swift 6 strict concurrency.
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Videos are public-domain works of NASA / JPL-Caltech, sourced from Wikimedia Commons and transcoded to H.264 for AVFoundation. auge results are produced by running real <code>auge</code> v1.8.0 on-device — no mocks.</p>
+      <p style="margin-top:10px"><a href="/">auge.franzai.com</a> · <a href="https://github.com/Arthur-Ficial/auge">github.com/Arthur-Ficial/auge</a></p>
+    </div>
+  </footer>
+</body>
+</html>
